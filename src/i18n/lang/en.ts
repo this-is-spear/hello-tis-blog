@@ -32,6 +32,10 @@ export default {
     featured: "Featured",
     recentPosts: "Recent Posts",
     allPosts: "All Posts",
+    topics: "Topics",
+    allTags: "All Tags",
+    noTopicPosts: "Posts are coming soon.",
+    moreTopicPosts: "More {{topic}} posts",
   },
   footer: {
     copyright: "Copyright",

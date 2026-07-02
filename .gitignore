@@ -29,5 +29,8 @@ public/pagefind
 # pnpm
 .pnpm-store
 
+# local brainstorming mockups
+.superpowers/
+
 # docker compose
 compose.override.yaml
