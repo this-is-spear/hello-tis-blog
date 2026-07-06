@@ -11,15 +11,16 @@ tags:
 ### 안건 1 : 외부 API 호출은 성공, 그런데 포인트는 차감되지 않았다?
 
 #### 문제 1 : 검증 오류로 발생한 정합성 오류
+
 고객 포인트가 외부 시스템으로 전환되었지만, 차감되지 않는 문제가 발생했습니다. 최근 차감 기능을 응집시키면서 실행 순서가 바뀌면서 오류가 발생하기 시작했습니다.
 
-| ASIS                                 | TOBE (문제 상황)                         |
-| ------------------------------------ | ------------------------------------ |
+| ASIS                                                                               | TOBE (문제 상황)                                                                               |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | ![ASIS 포인트 전환 흐름도](/posts/external-api-consistency-and-locking/fig-01.png) | ![TOBE 문제 상황의 포인트 전환 흐름도](/posts/external-api-consistency-and-locking/fig-02.png) |
 
 실제로는 아래처럼 외부 시스템과 불일치 상태 시나리오가 발생했습니다:
 
-1. 외부 API 호출  ✅
+1. 외부 API 호출 ✅
 2. 잔액 검증 (실패) ❌
 3. 잔액 부족 예외 발생 ❌
 
@@ -27,40 +28,43 @@ tags:
 
 **ASIS**
 테스트는 예외가 발생한 사실만 확인했을 뿐, 리팩토링 이후 부작용을 검증하지 않았습니다.
+
 ```kotlin
-@Test  
+@Test
 fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
     every { 제휴사포인트_서비스.전환요청(/* ... */) } returns apiResult
-	
-    assertThrows(교환예외::class.java) {  
-        제휴사포인트_유스케이스.포인트전환(/* ... */)  
-    } 
+
+    assertThrows(교환예외::class.java) {
+        제휴사포인트_유스케이스.포인트전환(/* ... */)
+    }
 }
 ```
 
 **TOBE**
 핫픽스하면서 외부 API 호출 여부를 판단하는 검증 로직도 함께 추가하게 됐습니다.
+
 ```kotlin
-@Test  
+@Test
 fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
     every { 제휴사포인트_서비스.전환요청(/* ... */) } returns apiResult
-	
-    assertThrows(교환예외::class.java) {  
-        제휴사포인트_유스케이스.포인트전환(/* ... */)  
-    } 
-    
-    // ✅ 예외 발생 후 호출되지 않아야 할 서비스들을 명시적으로 검증  
-    assertAll(   
-        { verify { 제휴사전환이력.전환이력요청(/*...*/) wasNot Called } },  
-        { verify { 제휴사전환이력.전환이력완료(/*...*/) wasNot Called } },  
-        { verify { 제휴사전환이력.전환이력실패(/*...*/) wasNot Called } },  
-        { verify { 제휴사포인트_서비스.전환요청(/*...*/) wasNot Called } },  
-        { verify { 포인트서비스.포인트차감(/*...*/) wasNot Called } },  
+
+    assertThrows(교환예외::class.java) {
+        제휴사포인트_유스케이스.포인트전환(/* ... */)
+    }
+
+    // ✅ 예외 발생 후 호출되지 않아야 할 서비스들을 명시적으로 검증
+    assertAll(
+        { verify { 제휴사전환이력.전환이력요청(/*...*/) wasNot Called } },
+        { verify { 제휴사전환이력.전환이력완료(/*...*/) wasNot Called } },
+        { verify { 제휴사전환이력.전환이력실패(/*...*/) wasNot Called } },
+        { verify { 제휴사포인트_서비스.전환요청(/*...*/) wasNot Called } },
+        { verify { 포인트서비스.포인트차감(/*...*/) wasNot Called } },
     )
 }
 ```
 
 #### 결과1 : 일어나지 말아야 할 일을 체크하기.
+
 테스트의 침묵은 정상 동작을 의미하지 않습니다. 명시적으로 검증하지 않은 곳은 언제든 문제가 발생할 수 있습니다. 이번 경험을 통해 일어나야 할 일과 일어나지 말아야 할 일을 체크해야 함을 경험하게 됐습니다.
 
 - 무엇이 일어났는가 (예외 발생, 반환값 확인)
@@ -69,13 +73,14 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
 위 상황에 맞게 상태 검증을 할지 행위 검증을 할지 결정할 필요성을 알게 됐습니다.
 
 #### 딥다이브1 : 행위 검증 여부를 판단하자.
+
 이번 일을 계기로 변화하는 코드에서도 안정적으로 개발하는 방법에 대해서 고려하게 됐습니다. 우려되는 건 **작성된 테스트가 잘 관리가 될지** 또는 **유사한 문제가 발생하진 않을지** 걱정되서 어떤 고민을 하면 더 좋을지 분석해보기로 했습니다.
 
 - 알게된 사실 : 테스트가 통과한다고 시스템이 정상인 것은 아니다
 - 공부한 내용
-	- **테스트 더블을 사용할 때, 상태 검증(state verification) 또는 행위 검증(behavior verification)이 빠져선 안된다.**
-	- **실행 순서가 중요한 경우 Mockito InOrder 등을 활용해 명시적으로 검증해야 한다.**
-	- **실행 흐름 파악도 좋지만, 불변식(invariant)을 검증하는 일이 효과적이다.**
+  - **테스트 더블을 사용할 때, 상태 검증(state verification) 또는 행위 검증(behavior verification)이 빠져선 안된다.**
+  - **실행 순서가 중요한 경우 Mockito InOrder 등을 활용해 명시적으로 검증해야 한다.**
+  - **실행 흐름 파악도 좋지만, 불변식(invariant)을 검증하는 일이 효과적이다.**
 
 **딥다이브 1 : 상태 검증과 행위 검증**
 
@@ -88,19 +93,19 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
 실행 순서가 중요한 경우 명시적으로 검증할 필요가 있었습니다. [Mockito InOrder](https://www.javadoc.io/doc/org.mockito/mockito-core/2.6.9/org/mockito/InOrder.html) 활용해서 동작 순서를 검증할 수 있습니다.
 
 ```kotlin
-@Test 
-fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {  
+@Test
+fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
     // ...
-    // When & Then  
-    assertThrows<BaseException> {  
-        exchangePointsUseCase.exchangePoint(command)  
-    }  
-  
-    // ✅ 순차적으로 실행여부를 판단  
-    inOrder.verify(제휴사포인트_서비스).전환최대한도조회(command.userId)  
-    inOrder.verify(포인트_서비스).보유포인트조회(command.userId)  
-    // ✅ 이 시점에서 포인트 부족으로 인한 예외가 발생하므로 더 이상의 메서드는 호출되지 않음  
-    inOrder.verifyNoMoreInteractions()  
+    // When & Then
+    assertThrows<BaseException> {
+        exchangePointsUseCase.exchangePoint(command)
+    }
+
+    // ✅ 순차적으로 실행여부를 판단
+    inOrder.verify(제휴사포인트_서비스).전환최대한도조회(command.userId)
+    inOrder.verify(포인트_서비스).보유포인트조회(command.userId)
+    // ✅ 이 시점에서 포인트 부족으로 인한 예외가 발생하므로 더 이상의 메서드는 호출되지 않음
+    inOrder.verifyNoMoreInteractions()
 }
 ```
 
@@ -114,27 +119,29 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`() {
 @Test
 fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`()  {
     every { 제휴사포인트_서비스.전환요청(/* ... */) } returns apiResult
-	
+
     val 이전_보유포인트 = 회원.보유_포인트_조회()
     val 이전_제휴사보유포인트 = 내부_포인트_전환(제휴사포인트_서비스.보유_포인트_조회())
-	
-    assertThrows(교환예외::class.java) {  
-        제휴사포인트_유스케이스.포인트전환(/* ... */)  
-    } 
-    
+
+    assertThrows(교환예외::class.java) {
+        제휴사포인트_유스케이스.포인트전환(/* ... */)
+    }
+
     val 이후_보유포인트 = 회원.보유_포인트_조회()
     val 이후_제휴사보유포인트 = 내부_포인트_전환(제휴사포인트_서비스.보유_포인트_조회())
 
     // ✅ 불변!
     assertThat(이후_보유포인트 + 내부_포인트_전환(이후_제휴사보유포인트))
-	    .isEqualTo(이전_보유포인트 + 내부_포인트_전환(이전_제휴사보유포인트));     
+	    .isEqualTo(이전_보유포인트 + 내부_포인트_전환(이전_제휴사보유포인트));
 }
 ```
 
 ### 안건 2 : 차감되기 전에 전환하면 금전적인 손실을 떠안게 돼요.
+
 [토스ㅣSLASH 24 - 보상 트랜잭션으로 분산 환경에서도 안전하게 환전하기](https://www.youtube.com/watch?v=xpwRTu47fqY) 참고했습니다.​
 
 #### 문제 2 : 이미 사용된 포인트는 되돌릴 수 없다.
+
 차감 요청에서 오류가 발생하면 포인트 전환을 취소하는 보상 조치(Compensating Action)를 수행해야 합니다. 그러나 보상 조치(Compensating Action)를 수행한다고 해서 100% 일관성이 보장되지 않습니다. 방금 전환된 포인트가 사용되면 금전적인 손실을 떠안게 됩니다.
 
 > Compensating Actions can fail. For example, reversing a credit to an account can fail if the account owner withdrew the funds in between. A bank will try to deal with this via collections or moving the account into minus. In the end, though banks do have to write off money due to failed Compensating Actions: using a Compensating Action does not guarantee 100% consistency. - [Compensating Transaction Pattern](https://www.enterpriseintegrationpatterns.com/patterns/conversation/CompensatingAction.html)
@@ -147,8 +154,8 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`()  {
 
 그럼 현재 상황에서 차감 기능으로 보상 트랜잭션을 수행하면 어려운 보상 조치를 수행하지 않아도 됩니다.
 
-| ASIS                                 | TOBE                                 |
-| ------------------------------------ | ------------------------------------ |
+| ASIS                                                                                 | TOBE                                                                                 |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | ![ASIS 보상 트랜잭션 흐름도](/posts/external-api-consistency-and-locking/fig-04.png) | ![TOBE 보상 트랜잭션 흐름도](/posts/external-api-consistency-and-locking/fig-05.png) |
 
 #### 결과 2
@@ -173,13 +180,13 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`()  {
 [G마켓 - 오픈마켓 여행 플랫폼의 실전 API 연동 노하우](https://dev.gmarket.com/115)에서 참고했습니다. G마켓에서는 기능을 두 가지 예시를 보여줬고, 각 방식에 따라 관리 방식을 다르게 했습니다.
 
 - 여행 상품 상세 페이지 API
-	- 관리 방법 : 빠른 에러가 반환되도록 타임아웃 설정 및 fallback 방식 고려
-	- 대상 예시 : 사용자에게 노출되는 정보 (비행기표 리스트, 비행기표 할인 정보 등등)
+  - 관리 방법 : 빠른 에러가 반환되도록 타임아웃 설정 및 fallback 방식 고려
+  - 대상 예시 : 사용자에게 노출되는 정보 (비행기표 리스트, 비행기표 할인 정보 등등)
 - 실시간 예약 API
-	- 관리 방법 : 일관된 상태 유지되도록 상태머신 고려
-	- 대상 예시 : 이미 일어난 사건 (비행기 표 결제 완료 - 계좌 금액 차감 - 비행기 표 예매)
+  - 관리 방법 : 일관된 상태 유지되도록 상태머신 고려
+  - 대상 예시 : 이미 일어난 사건 (비행기 표 결제 완료 - 계좌 금액 차감 - 비행기 표 예매)
 
-그 중, 실시간 예약 API가 겪는 사례와 유사해서 추가 정리했습니다. 
+그 중, 실시간 예약 API가 겪는 사례와 유사해서 추가 정리했습니다.
 
 상태 머신을 도입하면 어떤 위치에 있는지 이해할 수 있습니다. 시스템은 자신만의 고유한 상태를 지닙니다. 세 개의 시스템은 일관된 상태로 동기화돼야 합니다.
 ![세 개의 시스템이 일관된 상태로 동기화되는 다이어그램](/posts/external-api-consistency-and-locking/fig-06.png)
@@ -199,17 +206,20 @@ fun `현재 포인트보다 큰 포인트 전환 요청이면 실패한다`()  {
 ![이벤트 단위로 appending하여 트랜잭션 상태를 추적하는 구조](/posts/external-api-consistency-and-locking/fig-08.png)
 
 ### 안건 3. 분산락 점유 시간을 65% 줄이는 방법
+
 [kakao tech카카오페이는 어떻게 수천만 결제를 처리할까? 우아한 결제 분산락 노하우 / if(kakaoAI)2024](https://www.youtube.com/watch?v=4wGTavSyLxE) 참고해서 개선했습니다.
 
 #### 상황 3 : 불필요하게 락을 유지하는 상황
+
 포인트 전환시 분산락이 적용됐습니다. 그 중 락 점유 시간의 65%가 외부 API 호출에 사용되고 있었습니다. 즉, 외부 API 호출을 추출하면 락 점유시간을 65% 감소(192ms -> 67ms) 가능합니다.
 
 - 포인트 전환시 p(95)=193ms 소요됩니다.
-	- ![포인트 전환 p95 응답시간 193ms 측정 그래프](/posts/external-api-consistency-and-locking/fig-09.png)
+  - ![포인트 전환 p95 응답시간 193ms 측정 그래프](/posts/external-api-consistency-and-locking/fig-09.png)
 - 그 중 외부 API 호출시 p(95)=126ms 소요되고 있습니다.
-	- ![외부 API 호출 p95 응답시간 126ms 측정 그래프](/posts/external-api-consistency-and-locking/fig-10.png)
+  - ![외부 API 호출 p95 응답시간 126ms 측정 그래프](/posts/external-api-consistency-and-locking/fig-10.png)
 
 #### 해결 3 : 동시성 제어 영역 좁히기
+
 이 과정에서 람다 함수를 활용한 새로운 방식을 도입했습니다.
 
 **ASIS**
@@ -229,23 +239,24 @@ fun 포인트전환(/* ... */) {
 
 ```kotlin
 fun 포인트전환(/* ... */) {
-    lockPort.lock(사용자_포인트_거래키) {  
+    lockPort.lock(사용자_포인트_거래키) {
         포인트_서비스.차감(/* ... */)
     }
-	
+
     제휴사포인트_서비스.전환요청(/* ... */)
-	
-    lockPort.lock(사용자_포인트_거래키) {  
+
+    lockPort.lock(사용자_포인트_거래키) {
         포인트_서비스.차감롤백(/* ... */)
     }
 }
 ```
 
 #### 결과 3 : 성능 향상 기대
+
 불필요한 락 범위를 제거하여 성능 향상을 기대할 수 있습니다.
 
-| ASIS                                 | TOBE                                 |
-| ------------------------------------ | ------------------------------------ |
+| ASIS                                                                                    | TOBE                                                                                    |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | ![ASIS 락 점유 범위 다이어그램](/posts/external-api-consistency-and-locking/fig-11.png) | ![TOBE 락 점유 범위 다이어그램](/posts/external-api-consistency-and-locking/fig-12.png) |
 
 람다 활용으로 얻은 이점은 다음과 같습니다.
@@ -254,6 +265,7 @@ fun 포인트전환(/* ... */) {
 - 두 번째로 필요한 부분에만 락을 적용할 수 있게 됐습니다. 메서드 레벨에서 적용되면 호출마다 락 여부를 판단해야 하는 피로도가 있습니다.
 
 #### 딥다이브 3 : 락 점유 시간 모니터링 해보기
+
 꼭 장점만 있진 않습니다. 다음처럼 장단점이 존재했고, 추가 지표를 수집해서 어떤 문제가 발생할지 예상할 필요가 있었습니다.
 
 - 장점 : 락 점유 시간 감소
@@ -262,33 +274,33 @@ fun 포인트전환(/* ... */) {
 즉, 락 점유 시간, 락 경합 지표를 획득할 필요가 있습니다. 다음 숫자로 지표를 수집할 필요가 있었습니다.
 
 - 안정성 : **락 조기 방출률, 락 획득 성공률, 락 획득 실패율 수집**
-- 락 점유 시간 : **락 해제 시각 - 락 종료 시각 측정** 
+- 락 점유 시간 : **락 해제 시각 - 락 종료 시각 측정**
 - 락 경합 : **키 별 락 획득 완료 시각 - 키 별 락 획득 시작 시각**
 
 spring boot actuator + micrometer prometheus 활용하면 간단하게 지표를 수집할 수 있습니다. 또한 grafana 로 prometheus 지표를 쉽게 시각화할 수도 있습니다.
 
-| actuator + micrometer 지표 간단 수집      | grafana + prometheus 시각화            |
-| ----------------------------------- | ----------------------------------- |
+| actuator + micrometer 지표 간단 수집                                                                | grafana + prometheus 시각화                                                                              |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | ![actuator와 micrometer로 수집한 지표 화면](/posts/external-api-consistency-and-locking/fig-13.png) | ![grafana와 prometheus로 시각화한 지표 대시보드](/posts/external-api-consistency-and-locking/fig-14.png) |
 
 **딥다이브 1 : 락 조기 방출률, 락 획득 성공률, 락 획득 실패율 수집**
 코드에서 tag 를 활용해 백분율을 계산하도록 구현할 수 있습니다.
 
 ```kotlin
-val lockCounter = Counter.builder("redisson_lock_acquired_total")  
-    .tag("status", "total")  
-    .register(Metrics.globalRegistry)  
-  
-val successCounter = Counter.builder("redisson_lock_acquired_total")  
-    .tag("status", "success")  
+val lockCounter = Counter.builder("redisson_lock_acquired_total")
+    .tag("status", "total")
     .register(Metrics.globalRegistry)
-      
-val preReleaseCounter = Counter.builder("redisson_lock_acquired_total")  
-    .tag("status", "preRelease")  
+
+val successCounter = Counter.builder("redisson_lock_acquired_total")
+    .tag("status", "success")
     .register(Metrics.globalRegistry)
-  
+
+val preReleaseCounter = Counter.builder("redisson_lock_acquired_total")
+    .tag("status", "preRelease")
+    .register(Metrics.globalRegistry)
+
 val errorCounter = Counter.builder("redisson_lock_acquired_total")
-    .tag("status", "error")  
+    .tag("status", "error")
     .register(Metrics.globalRegistry)
 ```
 
@@ -311,9 +323,9 @@ Grafana 에서 다음처럼 PromQL을 다음처럼 설정하면 원하는 지표
 **딥다이브 2 : 락 경합 시간 측정하기**
 락 획득 완료 시각 - 락 획득 시작 시각 측정했습니다.
 
-``` kotlin
-val lockAcquisitionTimer = Timer.builder("redisson_lock_acquisition_seconds")  
-    .description("Time spent acquiring distributed lock")  
+```kotlin
+val lockAcquisitionTimer = Timer.builder("redisson_lock_acquisition_seconds")
+    .description("Time spent acquiring distributed lock")
     .register(Metrics.globalRegistry)
 ```
 
@@ -336,8 +348,8 @@ rate(redisson_lock_acquisition_seconds_sum[5m]) / rate(redisson_lock_acquisition
 락 해제 시각 - 락 종료 시각 측정했습니다. **히스토그램 활용**하면 p(95) 지표 수집 가능합니다.
 
 ```kotlin
-val lockDurationTimer = Timer.builder("redisson_lock_duration_seconds")   
-    .publishPercentileHistogram()  
+val lockDurationTimer = Timer.builder("redisson_lock_duration_seconds")
+    .publishPercentileHistogram()
     .register(Metrics.globalRegistry)
 ```
 
