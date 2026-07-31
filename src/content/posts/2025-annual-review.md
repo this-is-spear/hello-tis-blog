@@ -18,18 +18,18 @@ tags:
 
 **업무 활동**
 
-- 리버스 엔지니어링으로 MSA 환경 개선하기
-- 외부 API 연동의 정합성, 분산락, 그리고 테스트 전략
-- 어깨너머 성과지표 배워보기 - 29cm 편
-- UPSERT, INSERT IGNORE 사용기 - 상태 변경과 멱등성 관리
+- [리버스 엔지니어링으로 MSA 환경 개선하기](/posts/reverse-engineering-msa-improvement)
+- [외부 API 연동의 정합성, 분산락, 그리고 테스트 전략](/posts/external-api-consistency-and-locking)
+- [어깨너머 성과지표 배워보기 - 29cm 편](/posts/learning-product-metrics-29cm)
+- [UPSERT, INSERT IGNORE 사용기 - 상태 변경과 멱등성 관리](/posts/upsert-insert-ignore-idempotency)
 
 **업무 외 활동**
 
-- 더 나은 코드를 위한 켄트백 Tidy First?
-- 유지보수하기 쉬운 객체지향 코드 만들기
-- 온라인 추첨 서비스 사이드 프로젝트 회고
-- 토스 고양이 키우기를 참고한 게이미피케이션 PoC 해보기
-- 우아콘 다녀오고 n8n 적용하기 위해 공부하기
+- [켄트 벡의 Tidy First?로 배운 점진적인 코드 정리](/posts/tidy-first-code-cleanup)
+- [유지보수하기 쉬운 객체지향 코드 만들기](/posts/maintainable-object-oriented-code)
+- [온라인 추첨 서비스 사이드 프로젝트 회고](/posts/online-raffle-side-project-retrospective)
+- [토스 고양이 키우기를 참고한 게이미피케이션 PoC](/posts/gamification-poc-with-event-sourcing)
+- [우아콘에서 얻은 아이디어를 n8n 자동화로 검증하기](/posts/n8n-ai-agent-automation-experiments)
 
 25년을 통틀어서 좋았던 일과 아쉬웠던 일을 대표적으로 꼽아보겠다.
 

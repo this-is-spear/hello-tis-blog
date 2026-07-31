@@ -6,6 +6,7 @@ export type TopicName =
   | "Platform"
   | "Product"
   | "AI"
+  | "Study"
   | "Weekly Review"
   | "Annual Review";
 
@@ -30,6 +31,7 @@ export const TOPICS: TopicDefinition[] = [
   { name: "Platform" },
   { name: "Product" },
   { name: "AI" },
+  { name: "Study" },
   { name: "Weekly Review" },
   { name: "Annual Review" },
 ];

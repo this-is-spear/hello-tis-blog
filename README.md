@@ -6,6 +6,7 @@
 - `Platform`
 - `Product`
 - `AI`
+- `Study`
 - `Weekly Review`
 - `Annual Review`
 

@@ -35,6 +35,7 @@ describe("getTopicGroups", () => {
         "platform",
         "product",
         "ai",
+        "study",
         "weekly-review",
         "annual-review",
       ]
@@ -47,12 +48,14 @@ describe("getTopicGroups", () => {
       post("AI second", ["AI"]),
       post("Product third", ["Product"]),
       post("Operations fourth", ["Operations"]),
-      post("Weekly fifth", ["Weekly Review"]),
-      post("Annual sixth", ["Annual Review"]),
+      post("Study fifth", ["Study"]),
+      post("Weekly sixth", ["Weekly Review"]),
+      post("Annual seventh", ["Annual Review"]),
     ]);
 
     const platform = groups.find(group => group.name === "Platform");
     const product = groups.find(group => group.name === "Product");
+    const study = groups.find(group => group.name === "Study");
     const weekly = groups.find(group => group.name === "Weekly Review");
     const annual = groups.find(group => group.name === "Annual Review");
 
@@ -66,15 +69,20 @@ describe("getTopicGroups", () => {
       product?.previewPosts.map(item => item.data.title),
       ["Product third"]
     );
+    assert.equal(study?.count, 1);
+    assert.deepEqual(
+      study?.previewPosts.map(item => item.data.title),
+      ["Study fifth"]
+    );
     assert.equal(weekly?.count, 1);
     assert.deepEqual(
       weekly?.previewPosts.map(item => item.data.title),
-      ["Weekly fifth"]
+      ["Weekly sixth"]
     );
     assert.equal(annual?.count, 1);
     assert.deepEqual(
       annual?.previewPosts.map(item => item.data.title),
-      ["Annual sixth"]
+      ["Annual seventh"]
     );
   });
 
@@ -116,6 +124,7 @@ describe("getTopicTags", () => {
       post("Docs post", ["docs"]),
       post("Operations post", ["Operations"]),
       post("Product post", ["Product"]),
+      post("Study post", ["Study"]),
       post("Weekly post", ["Weekly Review"]),
       post("Annual post", ["Annual Review"]),
     ]);
@@ -125,6 +134,7 @@ describe("getTopicTags", () => {
       { tag: "platform", tagName: "Platform" },
       { tag: "product", tagName: "Product" },
       { tag: "ai", tagName: "AI" },
+      { tag: "study", tagName: "Study" },
       { tag: "weekly-review", tagName: "Weekly Review" },
       { tag: "annual-review", tagName: "Annual Review" },
     ]);
