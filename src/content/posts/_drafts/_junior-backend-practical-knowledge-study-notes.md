@@ -343,6 +343,24 @@ Speed Matters for Google Web Search 에서 인사이트
       - 시작과 끝에 메타데이터 잠금(MDL)을 잡는다. 오래 실행 중인 쿼리나 안 닫힌 트랜잭션이 있으면 잠금을 못 잡고, 그 뒤로 들어오는 쿼리까지 전부 대기한다. 실행 전에 긴 쿼리가 없는지 확인한다.
       - 도중에 중단하면 임시 테이블 정리와 롤백 비용이 든다. 복사 진행률은 `performance_schema`의 stage 이벤트로 확인할 수 있다.
     - 서비스 중단이 부담되면 gh-ost, pt-online-schema-change 같은 도구로 복사 속도를 조절하며 진행한다.
+    - 주기 실행이 필요하면 MySQL 이벤트 스케줄러로 DB 수준에서 돌릴 수 있다.
+
+      ```sql
+      -- 이벤트 스케줄러 활성화 (기본 ON, RDS는 파라미터 그룹에서 설정)
+      SET GLOBAL event_scheduler = ON;
+
+      -- 매월 1회 새벽에 실행하는 이벤트
+      CREATE EVENT optimize_order_history
+      ON SCHEDULE EVERY 1 MONTH
+      STARTS '2026-09-01 03:00:00'
+      DO OPTIMIZE TABLE order_history;
+      ```
+
+    - 이벤트 스케줄러 주의사항 (실무에서는 외부 배치를 권하는 이유)
+      - 실패해도 알림이 없다. 결과는 `information_schema.EVENTS`나 에러 로그를 직접 확인해야 한다. 외부 배치(cron)는 실패 알림·재시도·로그를 붙일 수 있다.
+      - 실행 전 안전 확인을 못 한다. 긴 쿼리와 겹치면 메타데이터 잠금 대기가 쌓이는데, 이벤트는 무조건 정시에 돈다. 외부 스크립트는 "긴 쿼리 없는지 확인 → 실행" 같은 사전 점검을 넣을 수 있다.
+      - `OPTIMIZE TABLE`은 binlog로 복제돼 복제본도 같은 재생성을 수행한다. 이벤트 자체는 소스에서만 실행되고 복제본에서는 `SLAVESIDE_DISABLED`로 비활성 상태다.
+      - 전제 : InnoDB는 주기적인 OPTIMIZE가 필요 없는 경우가 대부분이다. 대량 삭제·아카이빙 직후 단편화가 실제로 생겼을 때(`information_schema.TABLES`의 `DATA_FREE`로 확인) 일회성으로 돌리는 게 정석이고, 정기 실행은 매번 테이블 전체 복사 비용을 내는 낭비가 되기 쉽다.
 
 - 트랜잭션
   - 트랜잭션 경계 정확하게 설정하는 방법
