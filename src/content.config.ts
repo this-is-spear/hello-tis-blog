@@ -16,7 +16,10 @@ const TOPIC_TAGS = [
 ] as const;
 
 const posts = defineCollection({
-  loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
+  loader: glob({
+    pattern: ["**/[^_]*.{md,mdx}", "!**/_*/**"],
+    base: `./${BLOG_PATH}`,
+  }),
   schema: ({ image }) =>
     z.object({
       author: z.string().default(config.site.author),
