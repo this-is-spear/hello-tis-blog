@@ -207,6 +207,22 @@ glibc와 jemalloc의 격차 그래프가 갈린 건 배치 규칙의 차이다.
       - 이유: 온라인 DDL이라도 사실상 테이블 전체를 복사한다 — 테이블 크기만큼 디스크 여유가 필요하고 복제 지연이 생긴다
       - 문제: 시작과 끝에 메타데이터 잠금(MDL)을 잡아서, 오래 실행 중인 쿼리가 있으면 그 뒤로 들어오는 쿼리까지 전부 대기한다. 중단이 부담되면 gh-ost나 pt-online-schema-change로 복사 속도를 조절한다
       - 참고: InnoDB에선 "Table does not support optimize, doing recreate + analyze instead" 메시지가 나온다 — 에러가 아니라 재생성으로 대신 처리했다는 정상 동작이다
+    - `OPTIMIZE TABLE`은 정기 실행하지 않고 일회성으로 돌린다
+      - 이유: InnoDB는 주기적인 OPTIMIZE가 필요 없는 경우가 대부분이다. 대량 삭제·아카이빙 직후 `information_schema.TABLES`의 `DATA_FREE`로 단편화를 확인하고 돌리는 게 정석이다
+      - 문제: 정기 실행은 매번 테이블 전체 복사 비용을 내는 낭비가 되기 쉽다
+    - 주기 실행이 꼭 필요하면 MySQL 이벤트 스케줄러보다 외부 배치(cron)를 쓴다
+
+      ```sql
+      -- 이벤트 스케줄러로 매월 1회 실행 (기본 ON, RDS는 파라미터 그룹에서 설정)
+      CREATE EVENT optimize_order_history
+      ON SCHEDULE EVERY 1 MONTH
+      STARTS '2026-09-01 03:00:00'
+      DO OPTIMIZE TABLE order_history;
+      ```
+
+      - 이유: 이벤트는 실패해도 알림이 없고(`information_schema.EVENTS`나 에러 로그를 직접 봐야 한다), 긴 쿼리가 돌고 있어도 무조건 정시에 돈다
+      - 문제: 긴 쿼리와 겹치면 메타데이터 잠금 대기가 쌓인다. 외부 배치는 실패 알림·재시도와 "긴 쿼리 없는지 확인 후 실행" 같은 사전 점검을 붙일 수 있다
+      - 참고: `OPTIMIZE TABLE`은 binlog로 복제돼 복제본도 같은 재생성을 수행한다. 이벤트 자체는 복제본에서 `SLAVESIDE_DISABLED`로 비활성이다
 
 - **트랜잭션 경계는 어떻게 잡나**
   - 함께 성공하거나 함께 실패해야 하는 변경만 한 트랜잭션에 묶는다. 외부 API 호출·파일 I/O·알림 발송은 밖으로 뺀다 — 외부 응답이 느리면 그 시간만큼 DB 커넥션과 잠금을 쥐고 있게 되고, 외부 실패가 DB 롤백까지 끌고 간다.
