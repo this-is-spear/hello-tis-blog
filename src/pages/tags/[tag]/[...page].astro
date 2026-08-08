@@ -20,7 +20,10 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
 
   return tags.flatMap(({ tag, tagName }) => {
     const tagPosts = getSortedPosts(
-      posts.filter(({ data }) => slugifyAll(data.tags).includes(tag))
+      posts.filter(
+        ({ data }) =>
+          !data.hideFromCategories && slugifyAll(data.tags).includes(tag)
+      )
     );
 
     return paginate(tagPosts, {

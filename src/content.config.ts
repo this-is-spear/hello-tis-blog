@@ -28,6 +28,7 @@ const posts = defineCollection({
       title: z.string(),
       featured: z.boolean().optional(),
       draft: z.boolean().optional(),
+      hideFromCategories: z.boolean().optional(),
       tags: z.array(z.enum(TOPIC_TAGS)).length(1).default(["Platform"]),
       ogImage: image().or(z.string()).optional(),
       description: z.string(),
