@@ -46,8 +46,9 @@ function getPrimaryTagSlug(post: CollectionEntry<"posts">): string {
 }
 
 export function getTopicTags(posts: CollectionEntry<"posts">[]): TopicTag[] {
+  const categoryPosts = posts.filter(post => !post.data.hideFromCategories);
   const slugsInUse = new Set(
-    posts.flatMap(post => post.data.tags.map(tag => topicSlug(tag)))
+    categoryPosts.flatMap(post => post.data.tags.map(tag => topicSlug(tag)))
   );
 
   return TOPICS.map(topic => ({
@@ -60,9 +61,13 @@ export function getTopicGroups(
   posts: CollectionEntry<"posts">[],
   previewLimit = 3
 ): TopicGroup[] {
+  const categoryPosts = posts.filter(post => !post.data.hideFromCategories);
+
   return TOPICS.map(topic => {
     const slug = topicSlug(topic.name);
-    const topicPosts = posts.filter(post => getPrimaryTagSlug(post) === slug);
+    const topicPosts = categoryPosts.filter(
+      post => getPrimaryTagSlug(post) === slug
+    );
 
     return {
       ...topic,

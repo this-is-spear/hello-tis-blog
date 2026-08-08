@@ -69,6 +69,7 @@ const {
   timezone,
   tags,
   hideEditPost,
+  hideFromCategories = false,
 } = post.data;
 
 const { Content } = await render(post);
@@ -149,9 +150,15 @@ const ogImage = ogImageUrl
 
     <BackToTopButton />
 
-    <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
-      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
-    </ul>
+    {
+      !hideFromCategories && (
+        <ul class="mt-4 mb-8 flex flex-wrap gap-4 sm:my-8">
+          {tags.map(tag => (
+            <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />
+          ))}
+        </ul>
+      )
+    }
 
     <ShareLinks />
 

@@ -6,7 +6,8 @@ import { getTopicGroups, getTopicTags, TOPICS } from "./getTopicGroups.ts";
 function post(
   title: string,
   tags: string[],
-  description = `${title} description`
+  description = `${title} description`,
+  hideFromCategories = false
 ): CollectionEntry<"posts"> {
   return {
     id: title.toLowerCase().replaceAll(" ", "-"),
@@ -16,6 +17,7 @@ function post(
       description,
       pubDatetime: new Date("2026-07-02T00:00:00Z"),
       tags,
+      hideFromCategories,
     },
   } as CollectionEntry<"posts">;
 }
@@ -114,6 +116,21 @@ describe("getTopicGroups", () => {
     assert.equal(operations?.count, 0);
     assert.deepEqual(operations?.previewPosts, []);
   });
+
+  it("excludes category-hidden posts", () => {
+    const groups = getTopicGroups([
+      post("Visible study", ["Study"]),
+      post("Shared study", ["Study"], undefined, true),
+    ]);
+
+    const study = groups.find(group => group.name === "Study");
+
+    assert.equal(study?.count, 1);
+    assert.deepEqual(
+      study?.posts.map(item => item.data.title),
+      ["Visible study"]
+    );
+  });
 });
 
 describe("getTopicTags", () => {
@@ -143,6 +160,15 @@ describe("getTopicTags", () => {
   it("ignores non-topic secondary tags", () => {
     const tags = getTopicTags([
       post("Mixed post", ["Platform", "Productivity", "Workflow"]),
+    ]);
+
+    assert.deepEqual(tags, [{ tag: "platform", tagName: "Platform" }]);
+  });
+
+  it("excludes tags used only by category-hidden posts", () => {
+    const tags = getTopicTags([
+      post("Visible platform", ["Platform"]),
+      post("Shared study", ["Study"], undefined, true),
     ]);
 
     assert.deepEqual(tags, [{ tag: "platform", tagName: "Platform" }]);
