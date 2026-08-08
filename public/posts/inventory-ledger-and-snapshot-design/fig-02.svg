@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 720" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#374151"/>
+    </marker>
+    <pattern id="hatch" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="#fff7ed"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#fb923c" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="880" height="720" fill="#ffffff"/>
+  <text x="440" y="38" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">S lock은 어디에 걸리나 — row(인덱스 레코드) 단위 vs 범위</text>
+
+  <!-- ===== Panel 1 : FK check, single record lock ===== -->
+  <rect x="30" y="58" width="820" height="290" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="52" y="88" font-size="15" font-weight="700" fill="#1e3a5f">① FK 검사의 S lock — 참조한 인덱스 레코드 하나에만 걸린다</text>
+
+  <!-- code box -->
+  <rect x="55" y="108" width="320" height="96" rx="6" fill="#0f172a"/>
+  <text x="70" y="134" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#e2e8f0">원장에 insert</text>
+  <text x="70" y="154" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#e2e8f0">  (product_id = 42, quantity = -1)</text>
+  <text x="70" y="186" font-size="12" fill="#93c5fd">FK 검사 : 스냅샷에 42가 존재하는가?</text>
+  <text x="55" y="228" font-size="12.5" fill="#475569">PK를 점(point) 조회 → 딱 그 레코드에만</text>
+  <text x="55" y="246" font-size="12.5" fill="#475569">S lock을 남긴다 (범위 아님)</text>
+
+  <!-- arrow to row 42 -->
+  <line x1="378" y1="170" x2="452" y2="245" stroke="#374151" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+  <!-- table -->
+  <rect x="460" y="108" width="280" height="30" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="600" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">스냅샷 — PK 인덱스</text>
+
+  <rect x="460" y="138" width="280" height="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="480" y="158" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">40 │ qty 120</text>
+  <rect x="460" y="168" width="280" height="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="480" y="188" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">41 │ qty 3</text>
+  <rect x="460" y="198" width="280" height="30" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="480" y="218" font-size="12.5" font-weight="700" font-family="'SF Mono', Menlo, monospace" fill="#1e40af">42 │ qty 87</text>
+  <rect x="460" y="228" width="280" height="30" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="480" y="248" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">43 │ qty 0</text>
+
+  <!-- lock badge -->
+  <rect x="756" y="201" width="76" height="24" rx="12" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="794" y="217" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">S lock</text>
+
+  <text x="460" y="290" font-size="12.5" fill="#475569">40·41·43에는 아무 락도 없다</text>
+  <text x="460" y="308" font-size="12.5" fill="#475569">→ 다른 상품의 주문은 전혀 대기하지 않는다</text>
+
+  <text x="52" y="332" font-size="12.5" fill="#64748b">※ 데드락 글의 시나리오는 A와 B가 같은 상품(42)을 사서, 같은 레코드 위에서 S lock이 겹친 경우다</text>
+
+  <!-- ===== Panel 2 : range locks ===== -->
+  <rect x="30" y="368" width="820" height="330" rx="10" fill="#fffbf5" stroke="#fdba74"/>
+  <text x="52" y="398" font-size="15" font-weight="700" fill="#9a3412">② 락이 "범위"로 걸리는 경우는 따로 있다 — next-key(gap) lock</text>
+
+  <!-- code box -->
+  <rect x="55" y="418" width="330" height="96" rx="6" fill="#0f172a"/>
+  <text x="70" y="444" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#e2e8f0">스냅샷을 범위 조건으로 update</text>
+  <text x="70" y="464" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#e2e8f0">  (product_id 41 ~ 43)</text>
+  <text x="70" y="496" font-size="12" fill="#fdba74">범위 스캔 (REPEATABLE READ)</text>
+
+  <text x="55" y="540" font-size="12.5" fill="#7c2d12">스캔이 지나간 레코드 + 레코드 사이 틈(gap)까지</text>
+  <text x="55" y="558" font-size="12.5" fill="#7c2d12">잠긴다 → 범위 안 신규 insert도 차단된다</text>
+
+  <!-- arrow -->
+  <line x1="388" y1="466" x2="452" y2="500" stroke="#374151" stroke-width="1.6" marker-end="url(#arrow2)"/>
+
+  <!-- table with gaps -->
+  <rect x="460" y="418" width="280" height="28" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="600" y="437" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">스냅샷 — PK 인덱스</text>
+
+  <rect x="460" y="446" width="280" height="28" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="480" y="465" font-size="12.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">40 │ qty 120</text>
+
+  <rect x="460" y="474" width="280" height="10" fill="url(#hatch)" stroke="#fb923c" stroke-width="0.8"/>
+  <rect x="460" y="484" width="280" height="28" fill="#ffedd5" stroke="#f97316" stroke-width="1.5"/>
+  <text x="480" y="503" font-size="12.5" font-weight="700" font-family="'SF Mono', Menlo, monospace" fill="#9a3412">41 │ qty 3</text>
+
+  <rect x="460" y="512" width="280" height="10" fill="url(#hatch)" stroke="#fb923c" stroke-width="0.8"/>
+  <rect x="460" y="522" width="280" height="28" fill="#ffedd5" stroke="#f97316" stroke-width="1.5"/>
+  <text x="480" y="541" font-size="12.5" font-weight="700" font-family="'SF Mono', Menlo, monospace" fill="#9a3412">42 │ qty 87</text>
+
+  <rect x="460" y="550" width="280" height="10" fill="url(#hatch)" stroke="#fb923c" stroke-width="0.8"/>
+  <rect x="460" y="560" width="280" height="28" fill="#ffedd5" stroke="#f97316" stroke-width="1.5"/>
+  <text x="480" y="579" font-size="12.5" font-weight="700" font-family="'SF Mono', Menlo, monospace" fill="#9a3412">43 │ qty 0</text>
+
+  <!-- bracket -->
+  <path d="M 750 476 L 762 476 L 762 586 L 750 586" fill="none" stroke="#f97316" stroke-width="1.6"/>
+  <text x="772" y="524" font-size="12" font-weight="700" fill="#9a3412">next-key</text>
+  <text x="772" y="540" font-size="12" font-weight="700" fill="#9a3412">lock</text>
+
+  <text x="480" y="606" font-size="11.5" fill="#9a3412">빗금 = gap lock (레코드 사이 틈)</text>
+
+  <!-- bottom notes -->
+  <line x1="52" y1="624" x2="828" y2="624" stroke="#fdba74" stroke-dasharray="4 4"/>
+  <text x="52" y="648" font-size="12.5" fill="#7c2d12">• WHERE가 인덱스를 못 타면 : 스캔한 모든 레코드에 락 → 사실상 테이블 전체가 잠긴 효과</text>
+  <text x="52" y="670" font-size="12.5" fill="#7c2d12">• FK 검사(①)는 유니크 키를 점 조회하므로 gap 없이 레코드 락 하나로 끝난다</text>
+</svg>

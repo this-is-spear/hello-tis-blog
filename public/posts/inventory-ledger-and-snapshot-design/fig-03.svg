@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="bBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker>
+    <marker id="bPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker>
+    <marker id="bRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker>
+    <marker id="bGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/></marker>
+    <marker id="bGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="480" fill="#ffffff"/>
+  <text x="450" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">비즈니스 로직 수준 — 재고를 무엇으로 다루는가</text>
+
+  <!-- order -->
+  <rect x="50" y="140" width="170" height="80" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="135" y="172" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1e3a5f">주문</text>
+  <text x="135" y="194" text-anchor="middle" font-size="12" fill="#475569">조회 · 예약 · 결제</text>
+
+  <!-- inbound -->
+  <rect x="50" y="330" width="170" height="80" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="135" y="362" text-anchor="middle" font-size="14.5" font-weight="700" fill="#14532d">입고 · 운영 조정</text>
+  <text x="135" y="384" text-anchor="middle" font-size="12" fill="#475569">늦게 반영돼도 무해</text>
+
+  <!-- reservation -->
+  <rect x="360" y="60" width="210" height="88" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="465" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4c1d95">예약</text>
+  <text x="465" y="110" text-anchor="middle" font-size="12" fill="#475569">결제가 끝날 때까지 잡아둔 재고</text>
+  <text x="465" y="128" text-anchor="middle" font-size="12" fill="#475569">일정 시간이 지나면 자동 해제</text>
+
+  <!-- snapshot -->
+  <rect x="660" y="100" width="200" height="96" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="760" y="128" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a5f">스냅샷</text>
+  <text x="760" y="150" text-anchor="middle" font-size="12" fill="#475569">현재 판매 가능 수량</text>
+  <text x="760" y="168" text-anchor="middle" font-size="12" fill="#475569">조회와 차감의 기준</text>
+
+  <!-- ledger -->
+  <rect x="660" y="330" width="200" height="96" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="760" y="358" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">원장</text>
+  <text x="760" y="380" text-anchor="middle" font-size="12" fill="#475569">모든 변동의 불변 기록</text>
+  <text x="760" y="398" text-anchor="middle" font-size="12" fill="#475569">복구 · 정산 · 분쟁의 기준</text>
+
+  <!-- ledger -> snapshot relations (two parallel verticals) -->
+  <line x1="700" y1="330" x2="700" y2="202" stroke="#16a34a" stroke-width="1.6" stroke-dasharray="6 4" marker-end="url(#bGreen)"/>
+  <line x1="822" y1="330" x2="822" y2="202" stroke="#6b7280" stroke-width="1.4" stroke-dasharray="4 4" marker-end="url(#bGray)"/>
+  <text x="761" y="250" text-anchor="middle" font-size="11" fill="#6b7280">원장의 요약본</text>
+  <text x="761" y="267" text-anchor="middle" font-size="11" fill="#6b7280">언제든 재계산 가능</text>
+  <text x="761" y="284" text-anchor="middle" font-size="11" fill="#6b7280">주기 대사로 보정</text>
+
+  <!-- 1 read -->
+  <path d="M 220 152 C 400 130, 550 122, 654 130" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#bBlue)"/>
+  <text x="612" y="150" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563eb" stroke="#ffffff" stroke-width="5" paint-order="stroke">① 재고 확인</text>
+
+  <!-- 2 reserve -->
+  <line x1="220" y1="168" x2="354" y2="120" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#bPurple)"/>
+  <text x="276" y="104" text-anchor="middle" font-size="12.5" font-weight="600" fill="#7c3aed" stroke="#ffffff" stroke-width="5" paint-order="stroke">② 주문 시작 — 예약</text>
+
+  <!-- 3 confirm: to both -->
+  <path d="M 220 196 C 420 220, 560 200, 654 172" fill="none" stroke="#dc2626" stroke-width="1.8" marker-end="url(#bRed)"/>
+  <path d="M 220 214 C 400 290, 560 330, 654 352" fill="none" stroke="#dc2626" stroke-width="1.8" marker-end="url(#bRed)"/>
+  <text x="382" y="246" text-anchor="middle" font-size="12.5" font-weight="600" fill="#dc2626" stroke="#ffffff" stroke-width="5" paint-order="stroke">③ 결제 완료 — 확정 차감</text>
+  <text x="398" y="264" text-anchor="middle" font-size="11" fill="#b91c1c" stroke="#ffffff" stroke-width="5" paint-order="stroke">원장 기록과 스냅샷 차감은 함께 성공하거나 함께 실패</text>
+  <path d="M 465 148 L 465 196 " fill="none" stroke="#7c3aed" stroke-width="1.4" stroke-dasharray="4 3" marker-start="url(#bPurple)"/>
+  <text x="475" y="176" font-size="11.5" fill="#7c3aed">확정되면 예약 해제</text>
+
+  <!-- 4 inbound record -->
+  <line x1="220" y1="376" x2="654" y2="380" stroke="#16a34a" stroke-width="1.8" marker-end="url(#bGreen)"/>
+  <text x="404" y="366" text-anchor="middle" font-size="12.5" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">④ 원장에 기록만 한다</text>
+
+  <!-- 5 lazy apply (labels the green dashed vertical) -->
+  <text x="688" y="308" text-anchor="end" font-size="12.5" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">⑤ 스냅샷에는 나중에 반영</text>
+  <text x="688" y="326" text-anchor="end" font-size="11" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">늦어도 품절로 보일 뿐, 오버셀은 없다</text>
+
+  <text x="450" y="462" text-anchor="middle" font-size="11.5" fill="#94a3b8">오래된 원장 이력은 구간 합산을 남기고 정리한다(보관 정책) — 기술 선택은 인프라 수준 그림에서</text>
+</svg>

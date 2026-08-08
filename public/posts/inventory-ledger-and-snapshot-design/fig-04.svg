@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="iBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/></marker>
+    <marker id="iPurple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/></marker>
+    <marker id="iGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/></marker>
+    <marker id="iGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+  <text x="450" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">인프라 수준 — 무엇으로 구현하는가</text>
+
+  <!-- app -->
+  <rect x="40" y="200" width="170" height="80" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="125" y="232" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1e3a5f">주문 서비스</text>
+  <text x="125" y="254" text-anchor="middle" font-size="12" fill="#475569">앱 서버</text>
+
+  <!-- redis -->
+  <rect x="300" y="60" width="230" height="90" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="415" y="88" text-anchor="middle" font-size="14" font-weight="700" fill="#4c1d95">Redis — 예약</text>
+  <text x="415" y="110" text-anchor="middle" font-size="12" fill="#475569">TTL로 만료 자동화</text>
+  <text x="415" y="128" text-anchor="middle" font-size="12" fill="#475569">원장에는 기록하지 않음</text>
+
+  <!-- mysql group -->
+  <rect x="600" y="60" width="270" height="330" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="735" y="88" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">MySQL</text>
+
+  <rect x="620" y="104" width="230" height="100" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="735" y="128" text-anchor="middle" font-size="13" font-weight="700" fill="#1e3a5f">stock_snapshot</text>
+  <text x="636" y="150" font-size="11.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">available_qty · reserved_qty</text>
+  <text x="636" y="168" font-size="11.5" font-family="'SF Mono', Menlo, monospace" fill="#334155">last_ledger_id</text>
+  <text x="636" y="190" font-size="11" fill="#94a3b8">차감 = 조건부 UPDATE 한 문장</text>
+
+  <rect x="620" y="240" width="230" height="130" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="735" y="264" text-anchor="middle" font-size="13" font-weight="700" fill="#92400e">stock_ledger</text>
+  <text x="636" y="286" font-size="11.5" fill="#475569">reference_id + type 유니크</text>
+  <rect x="636" y="298" width="62" height="20" rx="3" fill="#fef3c7" stroke="#d97706"/><text x="667" y="312" text-anchor="middle" font-size="10" fill="#92400e">2026-06</text>
+  <rect x="702" y="298" width="62" height="20" rx="3" fill="#fef3c7" stroke="#d97706"/><text x="733" y="312" text-anchor="middle" font-size="10" fill="#92400e">2026-07</text>
+  <rect x="768" y="298" width="62" height="20" rx="3" fill="#fde68a" stroke="#d97706"/><text x="799" y="312" text-anchor="middle" font-size="10" fill="#92400e">2026-08</text>
+  <text x="636" y="336" font-size="11" fill="#94a3b8">created_at RANGE 파티션</text>
+  <text x="636" y="352" font-size="11" fill="#94a3b8">보관 정책: 이월 insert 후 파티션 DROP</text>
+
+  <text x="735" y="384" text-anchor="middle" font-size="11" fill="#b91c1c">두 테이블 사이 FK 없음 — S lock 원천 제거</text>
+
+  <!-- kafka -->
+  <rect x="300" y="300" width="230" height="100" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="415" y="326" text-anchor="middle" font-size="14" font-weight="700" fill="#14532d">카프카 — 입고·복원 반영</text>
+  <text x="415" y="348" text-anchor="middle" font-size="12" fill="#475569">product_id 파티션 키 (상품 단위 순서)</text>
+  <text x="415" y="366" text-anchor="middle" font-size="12" fill="#475569">컨슈머가 스냅샷에 순차 반영</text>
+  <text x="415" y="384" text-anchor="middle" font-size="11" fill="#94a3b8">last_ledger_id보다 오래된 이벤트 폐기</text>
+
+  <!-- batch -->
+  <rect x="300" y="450" width="230" height="80" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+  <text x="415" y="476" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">배치 서버</text>
+  <text x="415" y="496" text-anchor="middle" font-size="12" fill="#475569">대사(재집계·보정) · 보관(이월·정리)</text>
+  <text x="415" y="514" text-anchor="middle" font-size="11" fill="#94a3b8">보정량 임계치 초과 시 알림</text>
+
+  <!-- archive -->
+  <rect x="620" y="450" width="250" height="80" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="745" y="476" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">압축 아카이브</text>
+  <text x="745" y="496" text-anchor="middle" font-size="12" fill="#475569">ROW_FORMAT=COMPRESSED 또는 S3</text>
+  <text x="745" y="514" text-anchor="middle" font-size="11" fill="#94a3b8">지울 수 없는 구간 이관</text>
+
+  <!-- flows -->
+  <line x1="210" y1="216" x2="330" y2="150" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#iPurple)"/>
+  <text x="240" y="172" font-size="12" font-weight="600" fill="#7c3aed" stroke="#ffffff" stroke-width="5" paint-order="stroke">예약 · 해제</text>
+
+  <path d="M 210 228 C 400 210, 520 180, 614 154" fill="none" stroke="#2563eb" stroke-width="1.8" marker-end="url(#iBlue)"/>
+  <text x="430" y="216" text-anchor="middle" font-size="12" font-weight="600" fill="#2563eb" stroke="#ffffff" stroke-width="5" paint-order="stroke">조회 SELECT · 차감 트랜잭션 (insert + UPDATE)</text>
+
+  <line x1="210" y1="262" x2="294" y2="322" stroke="#16a34a" stroke-width="1.8" marker-end="url(#iGreen)"/>
+  <text x="212" y="304" font-size="12" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">입고·복원 발행</text>
+
+  <path d="M 530 330 C 570 300, 590 260, 614 190" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#iGreen)"/>
+  <text x="560" y="262" font-size="12" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">반영</text>
+
+  <path d="M 530 470 C 570 440, 590 400, 620 360" fill="none" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#iGray)"/>
+  <text x="548" y="426" font-size="12" font-weight="600" fill="#6b7280" stroke="#ffffff" stroke-width="5" paint-order="stroke">재집계 · 이월</text>
+
+  <line x1="735" y1="390" x2="740" y2="444" stroke="#6b7280" stroke-width="1.6" marker-end="url(#iGray)"/>
+  <text x="750" y="422" font-size="12" font-weight="600" fill="#6b7280" stroke="#ffffff" stroke-width="5" paint-order="stroke">이관</text>
+</svg>
