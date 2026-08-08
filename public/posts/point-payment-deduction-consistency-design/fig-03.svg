@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" font-family="-apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif">
+  <defs>
+    <marker id="cGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/></marker>
+    <marker id="cRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/></marker>
+    <marker id="cGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280"/></marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+  <text x="450" y="34" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">설계안 2 · 비즈니스 로직 수준 — 결제 먼저, 차감은 비동기 보정</text>
+
+  <!-- entry -->
+  <text x="135" y="66" text-anchor="middle" font-size="12.5" fill="#475569">결제 요청</text>
+  <line x1="135" y1="76" x2="135" y2="104" stroke="#6b7280" stroke-width="1.6" marker-end="url(#cGray)"/>
+
+  <!-- step 1: PG approval -->
+  <rect x="45" y="110" width="180" height="100" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.5"/>
+  <text x="135" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">① PG 결제 승인</text>
+  <text x="135" y="162" text-anchor="middle" font-size="12" fill="#475569">동기 호출은 이것 하나</text>
+
+  <!-- step 2: publish event -->
+  <rect x="265" y="110" width="180" height="100" rx="8" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="355" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="#14532d">② 차감 이벤트 발행</text>
+  <text x="355" y="162" text-anchor="middle" font-size="12" fill="#475569">카프카에 기록만</text>
+  <text x="355" y="180" text-anchor="middle" font-size="12" fill="#475569">여기서 결제 완료 응답</text>
+
+  <!-- step 3: ledger write -->
+  <rect x="485" y="110" width="180" height="100" rx="8" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="575" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a5f">③ 원장에 차감 기록</text>
+  <text x="575" y="162" text-anchor="middle" font-size="12" fill="#475569">컨슈머가 비동기 반영</text>
+  <text x="575" y="180" text-anchor="middle" font-size="12" fill="#475569">중복 제거 — 상세안 1</text>
+
+  <!-- step 4: reconciliation -->
+  <rect x="705" y="110" width="180" height="100" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.5"/>
+  <text x="795" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">④ 대사 배치</text>
+  <text x="795" y="162" text-anchor="middle" font-size="12" fill="#475569">원장 ↔ PG 기록 대조</text>
+  <text x="795" y="180" text-anchor="middle" font-size="12" fill="#475569">누락 · 불일치 사후 보정</text>
+
+  <!-- flow arrows -->
+  <line x1="225" y1="160" x2="259" y2="160" stroke="#16a34a" stroke-width="1.8" marker-end="url(#cGreen)"/>
+  <text x="242" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">성공</text>
+  <line x1="445" y1="160" x2="479" y2="160" stroke="#16a34a" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#cGreen)"/>
+  <text x="462" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#16a34a" stroke="#ffffff" stroke-width="5" paint-order="stroke">비동기</text>
+  <line x1="665" y1="160" x2="699" y2="160" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#cGray)"/>
+  <text x="682" y="148" text-anchor="middle" font-size="11" font-weight="600" fill="#6b7280" stroke="#ffffff" stroke-width="5" paint-order="stroke">주기 실행</text>
+
+  <!-- fail branch -->
+  <rect x="45" y="306" width="180" height="88" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="135" y="338" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">결제 실패로 종료</text>
+  <text x="135" y="360" text-anchor="middle" font-size="12" fill="#475569">포인트 건드린 적 없음</text>
+  <text x="135" y="378" text-anchor="middle" font-size="12" fill="#475569">보상 자체가 불필요</text>
+  <line x1="135" y1="210" x2="135" y2="300" stroke="#dc2626" stroke-width="1.8" marker-end="url(#cRed)"/>
+  <text x="145" y="260" font-size="11.5" fill="#dc2626" stroke="#ffffff" stroke-width="5" paint-order="stroke">승인 실패</text>
+
+  <!-- double-spend window -->
+  <line x1="300" y1="246" x2="630" y2="246" stroke="#dc2626" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <line x1="300" y1="240" x2="300" y2="252" stroke="#dc2626" stroke-width="1.4"/>
+  <line x1="630" y1="240" x2="630" y2="252" stroke="#dc2626" stroke-width="1.4"/>
+  <text x="465" y="272" text-anchor="middle" font-size="12.5" font-weight="600" fill="#dc2626" stroke="#ffffff" stroke-width="5" paint-order="stroke">발행 → 반영 사이의 창</text>
+  <text x="465" y="292" text-anchor="middle" font-size="11.5" fill="#b91c1c" stroke="#ffffff" stroke-width="5" paint-order="stroke">조회에는 차감 전 잔액이 보인다 — 이중 사용 위험</text>
+  <text x="465" y="310" text-anchor="middle" font-size="11.5" fill="#b91c1c" stroke="#ffffff" stroke-width="5" paint-order="stroke">방어선: 1인당 사용 한도 · 어뷰징 탐지</text>
+
+  <!-- reconciliation loop note -->
+  <path d="M 795 210 C 795 300, 740 340, 668 352" fill="none" stroke="#6b7280" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#cGray)"/>
+  <text x="800" y="300" font-size="11.5" fill="#6b7280" stroke="#ffffff" stroke-width="5" paint-order="stroke">불일치 발견 시</text>
+  <text x="800" y="316" font-size="11.5" fill="#6b7280" stroke="#ffffff" stroke-width="5" paint-order="stroke">보정 이력 추가</text>
+  <text x="660" y="376" text-anchor="end" font-size="11.5" fill="#6b7280">마이너스 잔액 정책 필요</text>
+  <text x="660" y="392" text-anchor="end" font-size="11.5" fill="#6b7280">(다음 적립 상계 또는 회수)</text>
+
+  <text x="450" y="540" text-anchor="middle" font-size="11.5" fill="#94a3b8">결제는 멈추지 않는다 — 오차는 배치가 사후에 흡수한다 (가용성 우선)</text>
+</svg>
