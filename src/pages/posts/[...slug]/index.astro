@@ -14,34 +14,60 @@ import ShareLinks from "./_components/ShareLinks.astro";
 import BackButton from "./_components/BackButton.astro";
 import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
+import TableOfContents from "./_components/TableOfContents.astro";
+import TopicPostNavigation from "./_components/TopicPostNavigation.astro";
 import config from "@/config";
+
+type TopicPost = {
+  id: string;
+  title: string;
+  filePath: string | undefined;
+  pubDatetime: Date;
+};
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
   const sortedPosts = getSortedPosts(posts);
 
-  return sortedPosts.map((post, index) => ({
-    params: { slug: getPostSlug(post.id, post.filePath) },
-    props: {
-      post,
-      prevPost:
-        index > 0
-          ? {
-              id: sortedPosts[index - 1].id,
-              title: sortedPosts[index - 1].data.title,
-              filePath: sortedPosts[index - 1].filePath,
-            }
-          : null,
-      nextPost:
-        index < sortedPosts.length - 1
-          ? {
-              id: sortedPosts[index + 1].id,
-              title: sortedPosts[index + 1].data.title,
-              filePath: sortedPosts[index + 1].filePath,
-            }
-          : null,
-    },
-  }));
+  return sortedPosts.map((post, index) => {
+    const [primaryTag] = post.data.tags;
+    const topicPosts = sortedPosts
+      .filter(
+        candidate =>
+          candidate.data.tags[0] === primaryTag &&
+          (candidate.id === post.id || !candidate.data.hideFromCategories)
+      )
+      .map(candidate => ({
+        id: candidate.id,
+        title: candidate.data.title,
+        filePath: candidate.filePath,
+        pubDatetime: candidate.data.pubDatetime,
+      }));
+
+    return {
+      params: { slug: getPostSlug(post.id, post.filePath) },
+      props: {
+        post,
+        topicPosts,
+        prevPost:
+          index > 0
+            ? {
+                id: sortedPosts[index - 1].id,
+                title: sortedPosts[index - 1].data.title,
+                filePath: sortedPosts[index - 1].filePath,
+              }
+            : null,
+        nextPost:
+          index < sortedPosts.length - 1
+            ? {
+                id: sortedPosts[index + 1].id,
+                title: sortedPosts[index + 1].data.title,
+                filePath: sortedPosts[index + 1].filePath,
+              }
+            : null,
+      },
+    };
+  });
 }
 
 type AdjacentPost = {
@@ -52,11 +78,12 @@ type AdjacentPost = {
 
 type Props = {
   post: CollectionEntry<"posts">;
+  topicPosts: TopicPost[];
   prevPost: AdjacentPost;
   nextPost: AdjacentPost;
 };
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post, topicPosts, prevPost, nextPost } = Astro.props;
 const locale = Astro.currentLocale ?? config.site.lang;
 
 const {
@@ -72,7 +99,7 @@ const {
   hideFromCategories = false,
 } = post.data;
 
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 
 let ogImageUrl: string | undefined;
 
@@ -106,6 +133,14 @@ const ogImage = ogImageUrl
   <Header />
 
   <BackButton />
+
+  <TopicPostNavigation
+    currentPostId={post.id}
+    topicName={tags[0] ?? "Posts"}
+    posts={topicPosts}
+  />
+
+  <TableOfContents {headings} />
 
   <main
     id="main-content"

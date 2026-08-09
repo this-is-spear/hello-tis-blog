@@ -1,0 +1,102 @@
+---
+type Heading = {
+  depth: number;
+  slug: string;
+  text: string;
+};
+
+type Props = {
+  headings: Heading[];
+};
+
+const { headings } = Astro.props;
+const navigationHeadings = headings.filter(
+  heading => heading.depth === 2 || heading.depth === 3
+);
+---
+
+{
+  navigationHeadings.length > 0 && (
+    <aside
+      data-post-toc
+      class="fixed top-24 hidden max-h-[calc(100vh-8rem)] w-52 overflow-y-auto pe-3 xl:block"
+      style={{ right: "max(1rem, calc(50% - 40rem))" }}
+    >
+      <nav aria-label="이 글의 목차">
+        <p class="mb-2 text-sm font-semibold">목차</p>
+        <ol class="border-border border-s">
+          {navigationHeadings.map(heading => (
+            <li>
+              <a
+                data-toc-link
+                href={`#${heading.slug}`}
+                class:list={[
+                  "text-muted-foreground hover:text-foreground -ms-px block border-s-2 border-transparent py-1.5 text-xs leading-5 transition-colors",
+                  heading.depth === 3 ? "ps-5" : "ps-3 font-medium",
+                ]}
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </aside>
+  )
+}
+
+<script>
+  let cleanupTableOfContents = () => {};
+
+  function initializeTableOfContents() {
+    cleanupTableOfContents();
+
+    const toc = document.querySelector<HTMLElement>("[data-post-toc]");
+    if (!toc) return;
+
+    const links = Array.from(
+      toc.querySelectorAll<HTMLAnchorElement>("[data-toc-link]")
+    );
+    const getTargetId = (link: HTMLAnchorElement) =>
+      decodeURIComponent(link.hash.slice(1));
+    const headings = links
+      .map(link => document.getElementById(getTargetId(link)))
+      .filter((heading): heading is HTMLElement => Boolean(heading));
+
+    const updateActiveHeading = () => {
+      let activeId = headings[0]?.id;
+
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top <= 120) {
+          activeId = heading.id;
+        } else {
+          break;
+        }
+      }
+
+      for (const link of links) {
+        if (getTargetId(link) === activeId) {
+          link.setAttribute("aria-current", "location");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      }
+    };
+
+    window.addEventListener("scroll", updateActiveHeading, { passive: true });
+    updateActiveHeading();
+
+    cleanupTableOfContents = () => {
+      window.removeEventListener("scroll", updateActiveHeading);
+    };
+  }
+
+  document.addEventListener("astro:page-load", initializeTableOfContents);
+</script>
+
+<style>
+  [data-toc-link][aria-current="location"] {
+    border-inline-start-color: var(--accent);
+    color: var(--accent);
+  }
+</style>

@@ -1,6 +1,5 @@
 ---
-import { getRelativeLocaleUrl } from "astro:i18n";
-import { tplStr, useTranslations } from "@/i18n";
+import type { CollectionEntry } from "astro:content";
 import config from "@/config";
 import type { TopicGroup } from "@/utils/getTopicGroups";
 import { getPostUrl } from "@/utils/getPostPaths";
@@ -12,67 +11,245 @@ type Props = {
 const { groups } = Astro.props;
 
 const locale = Astro.currentLocale ?? config.site.lang;
-const t = useTranslations(locale);
+const visibleGroups = groups.filter(group => group.count > 0);
+
+type DisplayPost = {
+  post: CollectionEntry<"posts">;
+  topicName: string;
+};
+
+type DisplayGroup = {
+  name: string;
+  slug: string;
+  count: number;
+  posts: DisplayPost[];
+};
+
+const operationsAndPlatform = visibleGroups.filter(
+  group => group.name === "Operations" || group.name === "Platform"
+);
+const combinedPosts = operationsAndPlatform
+  .flatMap(group => group.posts.map(post => ({ post, topicName: group.name })))
+  .sort(
+    (a, b) =>
+      b.post.data.pubDatetime.getTime() - a.post.data.pubDatetime.getTime()
+  );
+
+const unorderedDisplayGroups: DisplayGroup[] = [
+  ...(combinedPosts.length > 0
+    ? [
+        {
+          name: "Platform",
+          slug: "platform",
+          count: combinedPosts.length,
+          posts: combinedPosts,
+        },
+      ]
+    : []),
+  ...visibleGroups
+    .filter(group => !operationsAndPlatform.includes(group))
+    .map(group => ({
+      name: group.name,
+      slug: group.slug,
+      count: group.count,
+      posts: group.posts.map(post => ({ post, topicName: group.name })),
+    })),
+];
+
+const displayGroupOrder = [
+  "Annual Review",
+  "Weekly Review",
+  "Product",
+  "Platform",
+  "AI",
+  "Study",
+];
+const displayGroups = unorderedDisplayGroups.sort(
+  (a, b) =>
+    displayGroupOrder.indexOf(a.name) - displayGroupOrder.indexOf(b.name)
+);
+
+const totalPostCount = displayGroups.reduce(
+  (count, group) => count + group.count,
+  0
+);
+
+const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: config.site.timezone,
+});
 ---
 
-<section id="topics" class="pt-12 pb-6">
-  <div class="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-    <h2 class="text-2xl font-semibold tracking-wide">{t.home.topics}</h2>
-    <a
-      href={getRelativeLocaleUrl(locale, "tags")}
-      class="text-accent text-sm underline decoration-dashed underline-offset-4"
-    >
-      {t.home.allTags}
-    </a>
+<section
+  id="topics"
+  data-topic-board
+  class="relative left-1/2 w-[calc(100vw-2rem)] max-w-7xl -translate-x-1/2 pt-5 pb-2"
+>
+  <div class="mb-3">
+    <h1 class="text-2xl font-semibold tracking-wide">Posts</h1>
+    <p class="text-muted-foreground mt-1 text-sm">
+      주제를 선택하면 관련 글만 모아볼 수 있습니다.
+    </p>
   </div>
 
-  <div class="grid gap-4 sm:grid-cols-2">
+  <nav aria-label="글 주제 필터" class="mb-4 flex flex-wrap gap-2">
+    <button
+      type="button"
+      data-topic-filter="all"
+      data-topic-name="전체"
+      aria-pressed="true"
+      class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+    >
+      <span>전체</span>
+      <span data-filter-count class="text-muted-foreground text-xs">
+        {totalPostCount}
+      </span>
+    </button>
     {
-      groups.map(group => (
-        <article class="border-border bg-background rounded-lg border p-4">
-          <div class="border-border mb-3 flex items-baseline justify-between gap-3 border-b pb-3">
-            <h3 class="text-accent text-lg font-semibold">
-              {group.count > 0 ? (
-                <a
-                  href={getRelativeLocaleUrl(locale, `tags/${group.slug}/`)}
-                  class="underline decoration-dashed underline-offset-4"
-                >
-                  #{group.name}
-                </a>
-              ) : (
-                <span>#{group.name}</span>
-              )}
-            </h3>
-            <span class="text-muted-foreground text-sm whitespace-nowrap">
-              {group.count} posts
+      displayGroups.map(group => (
+        <button
+          type="button"
+          data-topic-filter={group.slug}
+          data-topic-name={group.name}
+          aria-pressed="false"
+          class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+        >
+          <span>{group.name}</span>
+          <span data-filter-count class="text-muted-foreground text-xs">
+            {group.count}
+          </span>
+        </button>
+      ))
+    }
+  </nav>
+
+  <p data-filter-status class="sr-only" aria-live="polite">
+    전체 글 {totalPostCount}개
+  </p>
+
+  <div data-topic-groups class="space-y-8">
+    {
+      displayGroups.map(group => (
+        <section
+          data-topic-section
+          data-topic={group.slug}
+          aria-labelledby={`topic-${group.slug}`}
+          class="border-border border-t pt-4"
+        >
+          <div class="mb-3 flex items-baseline gap-2">
+            <h2 id={`topic-${group.slug}`} class="text-xl font-semibold">
+              {group.name}
+            </h2>
+            <span class="text-muted-foreground text-sm">
+              글 {group.count}개
             </span>
           </div>
 
-          {group.previewPosts.length > 0 && (
-            <ul class="grid gap-3">
-              {group.previewPosts.map(post => (
-                <li>
-                  <a
-                    href={getPostUrl(post.id, post.filePath, locale)}
-                    class="hover:text-accent block leading-6 font-medium"
-                  >
-                    {post.data.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div data-post-grid class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {group.posts.map(({ post, topicName }) => (
+              <article
+                data-post-card
+                class="border-border bg-background hover:border-accent/60 focus-within:border-accent group min-h-56 rounded-xl border transition-colors"
+              >
+                <a
+                  href={getPostUrl(post.id, post.filePath, locale)}
+                  class="flex min-h-56 w-full flex-col p-4 no-underline"
+                  aria-label={`${post.data.title} 글 읽기`}
+                >
+                  <div class="mb-3 flex items-center justify-between gap-3">
+                    <span class="bg-muted rounded-full px-2.5 py-1 text-xs font-medium">
+                      {topicName}
+                    </span>
+                    <time
+                      datetime={post.data.pubDatetime.toISOString()}
+                      class="text-muted-foreground text-xs whitespace-nowrap"
+                    >
+                      {dateFormatter.format(post.data.pubDatetime)}
+                    </time>
+                  </div>
 
-          {group.count > group.previewPosts.length && (
-            <a
-              href={getRelativeLocaleUrl(locale, `tags/${group.slug}/`)}
-              class="text-accent mt-4 inline-block text-sm underline decoration-dashed underline-offset-4"
-            >
-              {tplStr(t.home.moreTopicPosts, { topic: group.name })}
-            </a>
-          )}
-        </article>
+                  <h3 class="group-hover:text-accent mb-2 text-base leading-6 font-semibold transition-colors">
+                    {post.data.title}
+                  </h3>
+                  <p class="text-muted-foreground line-clamp-2 text-sm leading-6">
+                    {post.data.description}
+                  </p>
+
+                  <span class="text-accent mt-auto pt-4 text-sm font-medium">
+                    읽어보기 →
+                  </span>
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
       ))
     }
   </div>
 </section>
+
+<script>
+  function initializeTopicFilter() {
+    const board = document.querySelector<HTMLElement>("[data-topic-board]");
+    if (!board || board.dataset.filterReady === "true") return;
+
+    const buttons = Array.from(
+      board.querySelectorAll<HTMLButtonElement>("[data-topic-filter]")
+    );
+    const sections = Array.from(
+      board.querySelectorAll<HTMLElement>("[data-topic-section]")
+    );
+    const status = board.querySelector<HTMLElement>("[data-filter-status]");
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        const selectedTopic = button.dataset.topicFilter ?? "all";
+        const selectedName = button.dataset.topicName ?? "전체";
+
+        for (const section of sections) {
+          const shouldShow =
+            selectedTopic === "all" || section.dataset.topic === selectedTopic;
+
+          section.hidden = !shouldShow;
+        }
+
+        for (const filterButton of buttons) {
+          filterButton.setAttribute(
+            "aria-pressed",
+            String(filterButton === button)
+          );
+        }
+
+        if (status) {
+          const visibleCount = sections
+            .filter(section => !section.hidden)
+            .reduce(
+              (count, section) =>
+                count + section.querySelectorAll("[data-post-card]").length,
+              0
+            );
+          status.textContent = `${selectedName} 글 ${visibleCount}개`;
+        }
+      });
+    }
+
+    board.dataset.filterReady = "true";
+  }
+
+  document.addEventListener("astro:page-load", initializeTopicFilter);
+</script>
+
+<style>
+  [data-topic-filter][aria-pressed="true"] {
+    border-color: var(--foreground);
+    background: var(--foreground);
+    color: var(--background);
+  }
+
+  [data-topic-filter][aria-pressed="true"] [data-filter-count] {
+    color: inherit;
+    opacity: 0.7;
+  }
+</style>
