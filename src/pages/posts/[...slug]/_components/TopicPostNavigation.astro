@@ -1,0 +1,71 @@
+---
+import { getPostUrl } from "@/utils/getPostPaths";
+import config from "@/config";
+
+type TopicPost = {
+  id: string;
+  title: string;
+  filePath: string | undefined;
+  pubDatetime: Date;
+};
+
+type Props = {
+  currentPostId: string;
+  topicName: string;
+  posts: TopicPost[];
+};
+
+const { currentPostId, topicName, posts } = Astro.props;
+const locale = Astro.currentLocale ?? config.site.lang;
+
+const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: config.site.timezone,
+});
+---
+
+{
+  posts.length > 0 && (
+    <aside
+      class="fixed top-24 hidden max-h-[calc(100vh-8rem)] w-52 overflow-y-auto pe-3 xl:block"
+      style={{ left: "max(1rem, calc(50% - 40rem))" }}
+    >
+      <nav aria-label={`${topicName} 주제의 글`}>
+        <p class="mb-2 text-sm font-semibold">{topicName}</p>
+
+        <ol class="border-border border-s">
+          {posts.map(topicPost => {
+            const isCurrent = topicPost.id === currentPostId;
+
+            return (
+              <li>
+                <a
+                  href={getPostUrl(topicPost.id, topicPost.filePath, locale)}
+                  aria-current={isCurrent ? "page" : undefined}
+                  class:list={[
+                    "-ms-px block border-s-2 py-2 ps-3 transition-colors",
+                    isCurrent
+                      ? "border-accent text-accent"
+                      : "text-muted-foreground hover:text-foreground border-transparent",
+                  ]}
+                >
+                  <span class="line-clamp-2 text-xs leading-5 font-medium">
+                    {topicPost.title}
+                  </span>
+                  <span class="mt-0.5 flex items-center justify-between gap-2 text-[0.6875rem] opacity-70">
+                    <time datetime={topicPost.pubDatetime.toISOString()}>
+                      {dateFormatter.format(topicPost.pubDatetime)}
+                    </time>
+                    {isCurrent && <span>현재</span>}
+                  </span>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    </aside>
+  )
+}
