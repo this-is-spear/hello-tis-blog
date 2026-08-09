@@ -1,5 +1,5 @@
 ---
-title: 재고를 원장으로 기록하고 스냅샷으로 조회하는 설계
+title: "설계 노트: 재고 원장과 스냅샷으로 동시성 다루기"
 description: 커머스 시스템 설계 스터디에서 논의한 재고 관리 구조를 정리했습니다. 원장 방식을 선택한 이유와 한계, 스냅샷을 차용하며 지켜야 할 원칙을 다룹니다.
 pubDatetime: 2026-08-07T00:00:00Z
 tags:
@@ -13,7 +13,7 @@ hideFromCategories: true
 > 참고 자료
 >
 > - 원본 정리: [커머스 시스템 설계 (1)](https://speckled-witch-b1a.notion.site/1-3a9679e066828073b964e191894aab41)
-> - 자매편: [포인트-결제 차감 순서와 정합성 설계안](/posts/point-payment-deduction-consistency-design)
+> - 자매편: [설계 노트: 포인트 차감과 결제 사이의 정합성 다루기](/posts/point-payment-deduction-consistency-design)
 
 ## 문제 정의
 
