@@ -70,6 +70,11 @@
       }
     }
 
+    /* 이미지 비교 표: 컬럼을 균등 분할해 이미지가 같은 크기로 나오게 한다 */
+    table:has(img) {
+      @apply w-full table-fixed;
+    }
+
     code {
       @apply bg-muted/75 text-foreground rounded p-1 wrap-break-word before:content-none after:content-none;
     }
