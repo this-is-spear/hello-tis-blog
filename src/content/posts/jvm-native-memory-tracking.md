@@ -4,7 +4,6 @@ description: 힙은 정상인데 컨테이너 RSS가 계속 올랐다. 원인은
 pubDatetime: 2026-08-09T00:00:00Z
 tags:
   - Operations
-draft: true
 ---
 
 ![컨테이너 안에서 정돈된 JVM 메모리 영역 바깥으로 파편화된 네이티브 메모리 블록이 쌓이는 모습](@/assets/images/jvm-native-memory-tracking/jvm-native-memory-tracking-cover.png)

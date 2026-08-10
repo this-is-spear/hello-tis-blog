@@ -10,7 +10,9 @@ type Props = {
 };
 
 const { headings } = Astro.props;
-const navigationHeadings = headings.filter(heading => heading.depth === 2);
+const navigationHeadings = headings.filter(
+  heading => heading.depth === 2 || heading.depth === 3
+);
 ---
 
 {
