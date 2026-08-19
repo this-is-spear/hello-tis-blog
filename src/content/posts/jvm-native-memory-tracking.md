@@ -344,6 +344,11 @@ glibc의 `free`는 보통 메모리를 곧바로 OS에 돌려주지 않는다. �
 재사용할 수 있도록 할당자 안에 보관한다. 멀티스레드 경합을 줄이기 위해
 arena를 여러 개 만들면 같은 보관이 arena마다 반복된다.
 
+![워커 스레드가 락이 걸리지 않은 arena를 골라 락을 잡고, 그 안의 free 조각에서 버퍼를 할당하는 glibc arena 도식](@/assets/images/jvm-native-memory-tracking/glibc-arena-allocation.svg)
+
+스레드는 한 번 붙은 arena를 계속 재사용하고, 락 경합이 나면 다른 arena를
+시도하거나 새로 만든다. arena가 스레드 수를 따라 늘어나는 이유다.
+
 보관된 메모리가 반환되지 못하는 조건도 있다. 한 페이지에 live와 free 조각이
 섞이거나, 반환 가능한 연속 영역 위를 작은 live 할당이 막으면 페이지 전체를
 반환하지 못한다.
