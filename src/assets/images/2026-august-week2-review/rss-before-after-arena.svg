@@ -1,0 +1,36 @@
+<svg viewBox="0 0 720 400" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif" role="img" aria-label="7월 11일부터 8월 19일까지 파드별 RSS 그래프. 배포 전에는 파드가 교체될 때마다 RSS가 다시 올라 오래 산 파드는 3.63 GiB, 다음 파드는 2.65 GiB까지 갔고, MALLOC_ARENA_MAX=4를 넣은 마지막 파드는 8일째 2.12 GiB에서 평평하다">
+  <rect x="0.5" y="0.5" width="719" height="399" rx="8" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+  <text x="24" y="28" font-size="15" font-weight="700" fill="#0b0b0b">파드별 RSS — 운영</text>
+  <text x="24" y="47" font-size="12" fill="#52514e">운영 대시보드 Memory Usage(w/o cache)에서 읽은 값 · 단위 GiB · 선이 끊긴 곳은 파드 교체</text>
+  <g font-size="12" fill="#52514e">
+    <circle cx="440" cy="24" r="4" fill="#2a78d6"/><text x="450" y="28">arena 기본</text>
+    <circle cx="536" cy="24" r="4" fill="#eb6834"/><text x="546" y="28">ARENA_MAX=4</text>
+  </g>
+  <g stroke="#e1e0d9" stroke-width="1">
+    <line x1="56" y1="282" x2="652" y2="282"/>
+    <line x1="56" y1="215" x2="652" y2="215"/>
+    <line x1="56" y1="148" x2="652" y2="148"/>
+  </g>
+  <line x1="56" y1="350" x2="652" y2="350" stroke="#c3c2b7" stroke-width="1"/>
+  <g font-size="11" fill="#898781" text-anchor="end">
+    <text x="48" y="354">0</text>
+    <text x="48" y="286">1</text>
+    <text x="48" y="219">2</text>
+    <text x="48" y="152">3</text>
+  </g>
+  <g font-size="11" fill="#898781" text-anchor="middle">
+    <text x="86.6" y="370">07/13</text>
+    <text x="178.3" y="370">07/19</text>
+    <text x="269.9" y="370">07/25</text>
+    <text x="361.6" y="370">07/31</text>
+    <text x="453.3" y="370">08/06</text>
+    <text x="545.0" y="370">08/12</text>
+    <text x="636.7" y="370">08/18</text>
+  </g>
+  <polyline points="60.6,116.8 71.3,116.4 78.9,115.8 86.6,115.4 94.2,114.4 101.8,113.8 109.5,113.4 117.1,111.7 132.4,111.4 147.7,111.1 155.3,110.7 163.0,107.7 178.3,107.3 193.5,107.0 201.2,106.7 208.8,106.3 224.1,106.0 231.7,105.7 239.4,105.3 245.5,105.0" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="247.0,229.8 250.1,210.9 254.7,210.3 262.3,211.6 269.9,210.9 285.2,210.3 288.3,196.8 300.5,195.4 315.8,189.3 331.1,186.7 346.4,185.3 361.6,183.3 369.3,182.6 376.9,172.5 392.2,171.1 468.6,171.1" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round"/>
+  <polyline points="535.9,285.9 538.9,219.7 545.0,218.4 552.7,217.0 560.3,216.3 575.6,215.7 590.9,215.0 606.2,215.0 621.4,213.7 636.7,213.0 641.3,208.9 644.4,207.6 652.0,206.9" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="535.9" y1="62" x2="535.9" y2="350" stroke="#eb6834" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="529.9" y="76" font-size="12" font-weight="700" fill="#eb6834" text-anchor="end">MALLOC_ARENA_MAX=4 배포</text>
+  <g font-size="12" font-weight="700" fill="#52514e"><text x="251" y="109">3.63</text><text x="396" y="163">2.65</text><text x="658" y="211">2.12</text></g>
+</svg>
