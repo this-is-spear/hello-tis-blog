@@ -26,7 +26,9 @@
 - 같은 기간 총 요청량·평균 동시 처리 요청 수·평균 응답 시간은 배포 앞뒤가 같았다 — arena 4에서 할당 지연은 나타나지 않았다. 다만 높은 동시성에서의 락 경합은 여전히 미검증
 - 값 4의 근거: Hadoop이 2011년부터 `hadoop-env.sh` 기본값으로 쓰고, [Cassandra](https://issues.apache.org/jira/browse/CASSANDRA-6126)도 같은 값
 - jemalloc은 폐기 — arena 축소만으로 효과 대부분이 나와서, 이미지에 라이브러리를 넣고 `LD_PRELOAD`를 거는 배포 변경 비용을 낼 이유가 없었다
-- 미해결: 8일차에 70MiB에서 175MiB로 한 번 뛰었다. 반복 여부는 관찰 중
+- 미해결이었던 8일차 점프의 후속 관찰(08/19 기준): 08/11 시작 파드도 8일차에 한 번 뛴 뒤 다시 평평하다. 계속 오르던 arena 기본 파드와 달리 계단 뒤 유지되는 모양. 점프가 왜 8일차마다 생기는지는 아직 모른다
+
+![MALLOC_ARENA_MAX=4 파드의 8일간 운영 RSS 추이 꺾은선 그래프. 시작 직후 약 1.95GiB까지 오른 뒤 7일간 거의 평평하고, 8일차에 한 번 뛰어 약 2.15GiB에서 유지된다](@/assets/images/2026-august-week2-review/rss-arena-max-8day-trend.svg)
 
 ## 도식: glibc arena 할당 경로
 
