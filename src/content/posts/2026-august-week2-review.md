@@ -67,7 +67,6 @@ tags:
   - OkHttp의 `callTimeout`: DNS 조회부터 연결, 요청 전송, 서버 처리, 응답 본문 읽기까지 전체 시간을 한 번에 제한한다. 기본값이 0(무제한)이라 직접 설정해야 한다. connect·read·write timeout은 각각 기본 10초다
 
   ![HTTP 호출을 풀 대기부터 응답 읽기까지 가로 타임라인으로 그린 도식. socket timeout은 응답 패킷 사이 간격마다 0부터 다시 재서 패킷이 이어지는 한 전체 시간에 제한이 없고, call timeout은 DNS 조회부터 응답 본문 끝까지 전체를 한 번에 잰다](@/assets/images/2026-august-week2-review/socket-timeout-vs-call-timeout.svg)
-
   - 응답이 큰 API나 스트리밍은 read/socket timeout만으로는 전체 시간에 상한이 없다. "이 호출은 총 N초 안에 끝나야 한다"는 요구가 있으면 call timeout처럼 전체를 재는 타임아웃이 필요하다
   - HttpClient 5의 `connectionRequestTimeout`은 풀에서 커넥션을 가져올 때까지의 대기 시간이다 — 본문의 "커넥션 풀 대기 1~5초"가 이 설정이다
 

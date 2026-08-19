@@ -532,6 +532,7 @@ HTTP 커넥션 풀
     ![HTTP 호출을 풀 대기부터 응답 읽기까지 가로 타임라인으로 그린 도식. socket timeout은 응답 패킷 사이 간격마다 0부터 다시 재서 패킷이 이어지는 한 전체 시간에 제한이 없고, call timeout은 DNS 조회부터 응답 본문 끝까지 전체를 한 번에 잰다](@/assets/images/2026-august-week2-review/socket-timeout-vs-call-timeout.svg)
 
   - Apache HttpClient 5의 `connectionRequestTimeout`은 풀에서 커넥션을 가져올 때까지의 대기 시간이다 — 본문의 "HTTP 커넥션 풀 대기 시간 1~5초"가 이 설정이다.
+
 - 재시도 횟수와 간격을 정하는 정량적인 기준
   - 책의 "1~2번, 3초"에 업계 기준을 붙이면 이렇다.
   - [Google SRE 책](https://sre.google/sre-book/handling-overload/): 요청당 최대 3회 시도 + 클라이언트 단위 retry budget — 전체 요청 대비 재시도 비율이 10%를 넘으면 재시도하지 않는다. budget 없이 요청당 3회만 제한하면 과부하 시 부하가 최대 3배까지 커지는데, budget을 얹으면 1.1배로 억제됐다는 실측이 실려 있다.
