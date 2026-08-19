@@ -42,9 +42,9 @@ jemalloc은 폐기했다. arena 축소만으로 로컬에서 효과의 대부분
 
 2. **RSS 추세 확인.** 배포 전 파드와 배포 후 파드를 시작 시점에 맞춰 겹쳤다. 뜬 직후 몇 시간은 힙이 정상적으로 커지는 구간이라, 경과 1일의 RSS를 기준으로 잡고 그 뒤 증가분만 봤다.
 
-   ![파드 시작 후 경과일별 RSS 증가분 꺾은선 그래프. arena 기본값 파드는 8일간 605MiB까지 계속 오르고, ARENA_MAX=4 파드는 7일차까지 70MiB에 머물다 8일차에 175MiB로 한 번 뛴다](@/assets/images/2026-august-week2-review/rss-growth-before-after-arena.svg)
-   - arena 기본: 8일간 +605MiB — 3일차에 한 번 크게 뛴 뒤로도 계속 오른다
-   - `MALLOC_ARENA_MAX=4`: 8일간 +175MiB — 3일차부터 7일차까지 40~70MiB 사이에 머물다 8일차에 175MiB로 한 번 뛴다
+   ![파드 시작 후 경과일별 RSS 꺾은선 그래프. arena 기본값 파드는 8일 내내 계단을 밟듯 올라 2.65 GiB에 이르고, ARENA_MAX=4 파드는 이틀째부터 2 GiB 근처에서 거의 평평하게 이어져 8일차에 2.12 GiB다](@/assets/images/2026-august-week2-review/rss-before-after-arena.svg)
+   - arena 기본: 2.06 → 2.65 GiB, 8일간 +605MiB — 3일차에 한 번 크게 뛴 뒤로도 계속 오른다
+   - `MALLOC_ARENA_MAX=4`: 1.95 → 2.12 GiB, 8일간 +175MiB — 7일차까지 2 GiB 근처에 머물다 8일차에 한 번 뛴다
 
 3. **트래픽과 응답 시간 확인.** 트래픽이 줄어서 RSS가 안 올랐다면 개선이 아니다. arena를 줄이면 할당이 느려질 수도 있다. 세 가지를 봤다.
 
