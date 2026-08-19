@@ -30,6 +30,10 @@
 
 ![MALLOC_ARENA_MAX=4 파드의 8일간 운영 RSS 추이 꺾은선 그래프. 시작 직후 약 1.95GiB까지 오른 뒤 7일간 거의 평평하고, 8일차에 한 번 뛰어 약 2.15GiB에서 유지된다](@/assets/images/2026-august-week2-review/rss-arena-max-8day-trend.svg)
 
+원본 대시보드 캡처(08/19). 발행 시 도식과 원본 중 하나를 고른다.
+
+![08/11 시작 파드의 Memory Usage (w/o cache) 대시보드 캡처. 위 도식의 원본 데이터](@/assets/images/2026-august-week2-review/memory-usage-arena-max-8days.webp)
+
 ## 도식: glibc arena 할당 경로
 
 트레이드오프 분석글에서 락 경합을 설명할 때 쓸 도식. 스타일은 1주차 회고의
