@@ -1,0 +1,113 @@
+<svg viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif" role="img" aria-label="2PC 커밋 한 번의 흐름 도식">
+  <rect x="0.5" y="0.5" width="719" height="519" rx="8" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0b0b0b"/>
+    </marker>
+    <marker id="ah-muted" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#52514e"/>
+    </marker>
+  </defs>
+
+  <text x="24" y="28" font-size="15" font-weight="700" fill="#0b0b0b">2PC 한 번의 커밋이 지나는 길</text>
+  <text x="24" y="47" font-size="12" fill="#52514e">prepare와 commit 두 라운드 동안 네트워크 왕복, 디스크 기록, 잠금 대기가 쌓인다</text>
+
+  <!-- actors -->
+  <g font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">
+    <rect x="92" y="70" width="116" height="26" rx="4" fill="#efeee8" stroke="#c3c2b7" stroke-width="0.8"/>
+    <text x="150" y="87">코디네이터</text>
+    <rect x="377" y="70" width="116" height="26" rx="4" fill="#efeee8" stroke="#c3c2b7" stroke-width="0.8"/>
+    <text x="435" y="87">참여자 A (DB)</text>
+    <rect x="577" y="70" width="116" height="26" rx="4" fill="#efeee8" stroke="#c3c2b7" stroke-width="0.8"/>
+    <text x="635" y="87">참여자 B (브로커)</text>
+  </g>
+
+  <!-- lifelines -->
+  <g stroke="#c3c2b7" stroke-width="1" stroke-dasharray="3 4">
+    <line x1="150" y1="96" x2="150" y2="428"/>
+    <line x1="435" y1="96" x2="435" y2="428"/>
+    <line x1="635" y1="96" x2="635" y2="428"/>
+  </g>
+
+  <!-- round brackets -->
+  <g stroke="#898781" stroke-width="1.2">
+    <line x1="36" y1="112" x2="36" y2="230"/>
+    <line x1="36" y1="112" x2="42" y2="112"/>
+    <line x1="36" y1="230" x2="42" y2="230"/>
+    <line x1="36" y1="252" x2="36" y2="416"/>
+    <line x1="36" y1="252" x2="42" y2="252"/>
+    <line x1="36" y1="416" x2="42" y2="416"/>
+  </g>
+  <g font-size="11" fill="#52514e">
+    <text x="46" y="124">1라운드</text>
+    <text x="46" y="139">prepare</text>
+    <text x="46" y="264">2라운드</text>
+    <text x="46" y="279">commit</text>
+  </g>
+
+  <!-- in-doubt bands (drawn first so arrows sit on top) -->
+  <rect x="395" y="212" width="80" height="132" rx="4" fill="#f4ead8" stroke="#d8c9a8" stroke-width="0.8"/>
+  <rect x="595" y="212" width="80" height="132" rx="4" fill="#f4ead8" stroke="#d8c9a8" stroke-width="0.8"/>
+  <g font-size="11" fill="#7a5c1e" text-anchor="middle">
+    <text x="535" y="248">in-doubt</text>
+    <text x="535" y="263">잠금을 쥔 채</text>
+    <text x="535" y="278">commit 지시 대기</text>
+  </g>
+
+  <!-- round 1: prepare -->
+  <g stroke="#0b0b0b" stroke-width="1.2">
+    <line x1="150" y1="124" x2="428" y2="124" marker-end="url(#ah)"/>
+    <line x1="150" y1="138" x2="628" y2="138" marker-end="url(#ah)"/>
+  </g>
+  <text x="200" y="118" font-size="11" fill="#0b0b0b">prepare</text>
+
+  <g font-size="10.5" fill="#1f4e8c" text-anchor="middle">
+    <rect x="375" y="152" width="120" height="20" rx="4" fill="#e3edf9" stroke="#9dbde4" stroke-width="0.8"/>
+    <text x="435" y="166">prepare 기록 · fsync</text>
+    <rect x="575" y="152" width="120" height="20" rx="4" fill="#e3edf9" stroke="#9dbde4" stroke-width="0.8"/>
+    <text x="635" y="166">prepare 기록 · fsync</text>
+  </g>
+
+  <g stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3">
+    <line x1="435" y1="192" x2="157" y2="192" marker-end="url(#ah-muted)"/>
+    <line x1="635" y1="206" x2="157" y2="206" marker-end="url(#ah-muted)"/>
+  </g>
+  <text x="200" y="186" font-size="11" fill="#52514e">예 (동의)</text>
+
+  <!-- coordinator decision -->
+  <g font-size="10.5" fill="#1f4e8c" text-anchor="middle">
+    <rect x="90" y="232" width="120" height="20" rx="4" fill="#e3edf9" stroke="#9dbde4" stroke-width="0.8"/>
+    <text x="150" y="246">결정 기록 · fsync</text>
+  </g>
+
+  <!-- round 2: commit -->
+  <g stroke="#0b0b0b" stroke-width="1.2">
+    <line x1="150" y1="284" x2="428" y2="284" marker-end="url(#ah)"/>
+    <line x1="150" y1="298" x2="628" y2="298" marker-end="url(#ah)"/>
+  </g>
+  <text x="200" y="278" font-size="11" fill="#0b0b0b">commit</text>
+
+  <g font-size="10.5" fill="#1f4e8c" text-anchor="middle">
+    <rect x="375" y="314" width="120" height="20" rx="4" fill="#e3edf9" stroke="#9dbde4" stroke-width="0.8"/>
+    <text x="435" y="328">commit 기록 · fsync</text>
+    <rect x="575" y="314" width="120" height="20" rx="4" fill="#e3edf9" stroke="#9dbde4" stroke-width="0.8"/>
+    <text x="635" y="328">commit 기록 · fsync</text>
+  </g>
+
+  <g font-size="10.5" fill="#52514e" text-anchor="middle">
+    <text x="435" y="360">잠금 해제</text>
+    <text x="635" y="360">잠금 해제</text>
+  </g>
+
+  <g stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3">
+    <line x1="435" y1="388" x2="157" y2="388" marker-end="url(#ah-muted)"/>
+    <line x1="635" y1="402" x2="157" y2="402" marker-end="url(#ah-muted)"/>
+  </g>
+  <text x="200" y="382" font-size="11" fill="#52514e">완료</text>
+
+  <!-- summary -->
+  <line x1="24" y1="444" x2="696" y2="444" stroke="rgba(11,11,11,0.10)"/>
+  <text x="24" y="468" font-size="12" font-weight="700" fill="#0b0b0b">커밋 한 번의 비용</text>
+  <text x="24" y="488" font-size="12" fill="#52514e">네트워크 왕복 2회 · 디스크 기록 5회(참여자 2회씩 + 코디네이터 1회) · 참여자는 in-doubt 동안 잠금 유지</text>
+</svg>

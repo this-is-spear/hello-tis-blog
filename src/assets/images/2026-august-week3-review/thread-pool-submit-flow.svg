@@ -1,0 +1,90 @@
+<svg viewBox="0 0 720 540" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif" role="img" aria-label="스레드 풀에서 요청이 실행되는 과정 도식 — 동작은 실선, 각 단계에서 발생하는 문제는 점선으로 표시">
+  <rect x="0.5" y="0.5" width="719" height="539" rx="8" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+
+  <defs>
+    <marker id="wf-ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#0b0b0b"/>
+    </marker>
+    <marker id="wf-ah-muted" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#52514e"/>
+    </marker>
+  </defs>
+
+  <text x="24" y="28" font-size="15" font-weight="700" fill="#0b0b0b">스레드 풀에서 요청이 실행되는 과정</text>
+
+  <!-- actors -->
+  <circle cx="110" cy="140" r="50" fill="#efeee8" stroke="#c3c2b7"/>
+  <text x="110" y="137" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">요청</text>
+  <text x="110" y="154" font-size="10.5" fill="#52514e" text-anchor="middle">(제출자)</text>
+
+  <circle cx="610" cy="140" r="50" fill="#efeee8" stroke="#c3c2b7"/>
+  <text x="610" y="137" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">워커 스레드</text>
+  <text x="610" y="154" font-size="10.5" fill="#52514e" text-anchor="middle">(실행자)</text>
+
+  <circle cx="360" cy="440" r="70" fill="#efeee8" stroke="#c3c2b7"/>
+  <text x="360" y="437" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">스레드 풀</text>
+  <text x="360" y="454" font-size="10.5" fill="#52514e" text-anchor="middle">(스레드 관리자)</text>
+
+  <rect x="200" y="250" width="140" height="52" rx="4" fill="#e1e0d9" stroke="#c3c2b7"/>
+  <line x1="235" y1="250" x2="235" y2="302" stroke="#c3c2b7" stroke-width="0.8"/>
+  <line x1="270" y1="250" x2="270" y2="302" stroke="#c3c2b7" stroke-width="0.8"/>
+  <line x1="305" y1="250" x2="305" y2="302" stroke="#c3c2b7" stroke-width="0.8"/>
+  <text x="290" y="240" font-size="12" font-weight="700" fill="#0b0b0b" text-anchor="middle">큐 (대기 작업 보관)</text>
+
+  <!-- 1-1: submit -->
+  <path d="M110,192 L110,440 L284,440" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="120" y="338" font-size="11" fill="#0b0b0b">1-1 작업 제출</text>
+
+  <!-- 1-2: reject (problem, dashed) -->
+  <path d="M300,480 L48,480 L48,140 L56,140" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="54" y="472" font-size="11" fill="#52514e">1-2 모두 가득이면 거부</text>
+
+  <!-- 2-1: pool delegates to worker -->
+  <path d="M414,384 L490,384 L490,150 L558,150" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="498" y="212" font-size="11" fill="#0b0b0b">2-1 여유 스레드에 위임</text>
+
+  <!-- 2-2: ThreadLocal (problem, dashed) -->
+  <path d="M503,312 L492,312" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="509" y="316" font-size="11" fill="#52514e">2-2 ThreadLocal 미전파</text>
+
+  <!-- 3-1: pool puts into queue -->
+  <path d="M330,368 L330,308" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="342" y="338" font-size="11" fill="#0b0b0b">3-1 core 차면 큐에 보관</text>
+
+  <!-- 3-2: unbounded queue (problem, dashed) -->
+  <path d="M210,216 L210,246" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="170" y="208" font-size="11" fill="#52514e">3-2 큐 무제한 — OOM·유실</text>
+
+  <!-- 4-1: pool creates new worker up to max -->
+  <path d="M425,410 L650,410 L650,176" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="432" y="427" font-size="11" fill="#0b0b0b">4-1 큐도 차면 max까지 증설</text>
+
+  <!-- 4-2: unreachable stage (problem, dashed) -->
+  <path d="M428,443 L428,416" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="436" y="447" font-size="11" fill="#52514e">4-2 무제한 큐면 도달 불가 — core 8개 고정</text>
+
+  <!-- 5-1: worker pulls from queue -->
+  <path d="M340,276 L610,276 L610,194" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="352" y="268" font-size="11" fill="#0b0b0b">5-1 꺼내서 실행</text>
+
+  <!-- 5-2: swallowed exception (problem, dashed) -->
+  <path d="M498,360 L498,282" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="509" y="352" font-size="11" fill="#52514e">5-2 submit() 예외는</text>
+  <text x="509" y="368" font-size="11" fill="#52514e">조용히 유실</text>
+
+  <!-- 6-1: worker notifies result -->
+  <path d="M610,88 L610,70 L110,70 L110,86" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="290" y="62" font-size="11" fill="#0b0b0b">6-1 완료 or 실패 통지</text>
+
+  <!-- 6-2: fire-and-forget (problem, dashed) -->
+  <path d="M595,50 L595,66" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="440" y="46" font-size="11" fill="#52514e">6-2 결과 안 보면 실패도 모른다</text>
+
+  <!-- 7-1: worker returns to pool -->
+  <path d="M660,140 L700,140 L700,470 L428,470" fill="none" stroke="#0b0b0b" stroke-width="1.2" marker-end="url(#wf-ah)"/>
+  <text x="470" y="488" font-size="11" fill="#0b0b0b">7-1 스레드 반납</text>
+
+  <!-- 7-2: worker recreation cost (problem, dashed) -->
+  <path d="M466,500 L466,476" fill="none" stroke="#52514e" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#wf-ah-muted)"/>
+  <text x="474" y="510" font-size="11" fill="#52514e">7-2 예외로 죽으면 재생성 비용</text>
+</svg>
