@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 430" width="880" height="430" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif" role="img">
+<title>CDC 파이프라인 부하 곡선. produced 와 consumed 두 선의 세로 간격이 lag이고, 발행 종료 직전에 1,156,000 으로 가장 벌어진다</title>
+<rect x="0.5" y="0.5" width="879" height="429" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+<defs>
+  <marker id="gap" markerWidth="8" markerHeight="8" refX="6.5" refY="2.8" orient="auto-start-reverse"><path d="M0,0 L0,5.6 L7.4,2.8 z" fill="#d97706"/></marker>
+</defs>
+<text x="78" y="26" font-size="15" fill="#1e293b" font-weight="700">CDC 파이프라인 부하 곡선 (200만 이벤트)</text>
+<text x="78" y="46" font-size="11" fill="#64748b">파티션 1개 · 컨슈머 스레드 1개 · 이벤트당 INFO 로깅</text>
+
+<line x1="78" y1="364" x2="850" y2="364" stroke="#e2e8f0"/><text x="70" y="368" font-size="10" fill="#64748b" text-anchor="end">0</text>
+<line x1="78" y1="288" x2="850" y2="288" stroke="#e2e8f0"/><text x="70" y="292" font-size="10" fill="#64748b" text-anchor="end">600k</text>
+<line x1="78" y1="212" x2="850" y2="212" stroke="#e2e8f0"/><text x="70" y="216" font-size="10" fill="#64748b" text-anchor="end">1200k</text>
+<line x1="78" y1="136" x2="850" y2="136" stroke="#e2e8f0"/><text x="70" y="140" font-size="10" fill="#64748b" text-anchor="end">1800k</text>
+<line x1="78" y1="60" x2="850" y2="60" stroke="#e2e8f0"/><text x="70" y="64" font-size="10" fill="#64748b" text-anchor="end">2400k</text>
+<line x1="78" y1="60" x2="78" y2="364" stroke="#e2e8f0"/><text x="78" y="382" font-size="10" fill="#64748b" text-anchor="middle">0s</text>
+<line x1="261.8" y1="60" x2="261.8" y2="364" stroke="#e2e8f0"/><text x="261.8" y="382" font-size="10" fill="#64748b" text-anchor="middle">10s</text>
+<line x1="445.6" y1="60" x2="445.6" y2="364" stroke="#e2e8f0"/><text x="445.6" y="382" font-size="10" fill="#64748b" text-anchor="middle">20s</text>
+<line x1="629.4" y1="60" x2="629.4" y2="364" stroke="#e2e8f0"/><text x="629.4" y="382" font-size="10" fill="#64748b" text-anchor="middle">30s</text>
+<line x1="813.2" y1="60" x2="813.2" y2="364" stroke="#e2e8f0"/><text x="813.2" y="382" font-size="10" fill="#64748b" text-anchor="middle">40s</text>
+
+<polygon fill="#d97706" fill-opacity="0.15" points="101.9,358.0 125.8,347.9 149.7,337.6 175.4,326.8 197.5,318.7 221.4,307.9 243.4,298.0 269.2,287.9 293.1,275.8 315.1,262.5 339.0,248.5 361.1,233.7 385.0,220.6 407.0,206.4 430.9,196.5 458.5,185.0 489.7,174.6 513.6,162.8 541.2,152.3 565.1,138.9 589.0,125.8 611.0,111.2 631.3,110.7 651.5,110.7 671.7,110.7 691.9,110.7 714.0,110.7 734.2,110.7 756.3,110.7 776.5,110.7 796.7,110.7 816.9,110.7 839.0,110.7 839.0,210.3 816.9,214.6 796.7,218.9 776.5,223.1 756.3,227.5 734.2,231.9 714.0,236.3 691.9,240.5 671.7,244.8 651.5,249.0 631.3,253.4 611.0,257.7 589.0,262.3 565.1,267.1 541.2,271.8 513.6,277.2 489.7,282.0 458.5,287.9 430.9,293.7 407.0,298.4 385.0,302.9 361.1,307.5 339.0,312.2 315.1,316.9 293.1,321.8 269.2,326.6 243.4,331.6 221.4,336.3 197.5,341.1 175.4,346.0 149.7,351.1 125.8,356.2 101.9,361.1"/>
+
+<polyline fill="none" stroke="#0284c7" stroke-width="2.4" stroke-linejoin="round" points="101.9,358.0 125.8,347.9 149.7,337.6 175.4,326.8 197.5,318.7 221.4,307.9 243.4,298.0 269.2,287.9 293.1,275.8 315.1,262.5 339.0,248.5 361.1,233.7 385.0,220.6 407.0,206.4 430.9,196.5 458.5,185.0 489.7,174.6 513.6,162.8 541.2,152.3 565.1,138.9 589.0,125.8 611.0,111.2 631.3,110.7 651.5,110.7 671.7,110.7 691.9,110.7 714.0,110.7 734.2,110.7 756.3,110.7 776.5,110.7 796.7,110.7 816.9,110.7 839.0,110.7"/>
+<polyline fill="none" stroke="#059669" stroke-width="2.4" stroke-linejoin="round" points="101.9,361.1 125.8,356.2 149.7,351.1 175.4,346.0 197.5,341.1 221.4,336.3 243.4,331.6 269.2,326.6 293.1,321.8 315.1,316.9 339.0,312.2 361.1,307.5 385.0,302.9 407.0,298.4 430.9,293.7 458.5,287.9 489.7,282.0 513.6,277.2 541.2,271.8 565.1,267.1 589.0,262.3 611.0,257.7 631.3,253.4 651.5,249.0 671.7,244.8 691.9,240.5 714.0,236.3 734.2,231.9 756.3,227.5 776.5,223.1 796.7,218.9 816.9,214.6 839.0,210.3"/>
+
+<line x1="631.3" y1="60" x2="631.3" y2="364" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="639.3" y="82" font-size="10.5" fill="#64748b">발행 종료 +30.1s</text>
+<text x="639.3" y="98" font-size="10.5" fill="#64748b">이후는 밀린 이벤트를 소진하는 구간</text>
+
+<line x1="611" y1="115" x2="611" y2="254" stroke="#d97706" stroke-width="1.8" marker-start="url(#gap)" marker-end="url(#gap)"/>
+<text x="601" y="180" font-size="11" font-weight="700" fill="#d97706" text-anchor="end">최고 lag 1,156,000</text>
+
+<rect x="78" y="400" width="20" height="3.5" rx="1.5" fill="#0284c7"/>
+<text x="104" y="407" font-size="11" fill="#64748b">produced</text>
+<rect x="182" y="400" width="20" height="3.5" rx="1.5" fill="#059669"/>
+<text x="208" y="407" font-size="11" fill="#64748b">consumed</text>
+<rect x="286" y="397" width="20" height="9" rx="2" fill="#d97706" fill-opacity="0.15" stroke="#d97706" stroke-opacity="0.5"/>
+<text x="312" y="407" font-size="11" fill="#64748b">lag</text>
+</svg>
