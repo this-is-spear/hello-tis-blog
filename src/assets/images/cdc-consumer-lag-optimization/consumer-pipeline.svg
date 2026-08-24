@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 620" width="880" height="620" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif" role="img">
+<title>컨슈머가 이벤트 1건을 처리하는 과정과 구간별 비용</title>
+<rect x="0.5" y="0.5" width="879" height="619" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="30" y="32" font-size="15" font-weight="700" fill="#1e293b">컨슈머의 이벤트 처리 과정 — 어디에 무엇이 쓰이는가</text>
+<text x="30" y="52" font-size="11" fill="#64748b">측정: 200만 건 부하의 catch-up 구간 · 소비 30,110 event/s</text>
+
+<!-- 전체 시간 분해 -->
+<text x="30" y="82" font-size="12.5" font-weight="700" fill="#1e293b">① 먼저 리스너 스레드의 전체 시간을 나눈다 (jdk.ThreadCPULoad)</text>
+<rect x="30" y="94" width="410" height="34" rx="4" fill="#dc2626" fill-opacity="0.20" stroke="#dc2626" stroke-opacity="0.4"/>
+<text x="235" y="116" font-size="11.5" font-weight="700" fill="#dc2626" text-anchor="middle">CPU 실행 ≈ 50%</text>
+<rect x="440" y="94" width="410" height="34" rx="4" fill="#94a3b8" fill-opacity="0.20" stroke="#94a3b8"/>
+<text x="645" y="116" font-size="11.5" font-weight="700" fill="#64748b" text-anchor="middle">대기 ≈ 50% (fetch·blocking I/O)</text>
+<text x="30" y="146" font-size="10.5" fill="#64748b">1코어의 약 50% 만 사용 — CPU 포화가 아니다. 아래 ②는 왼쪽 절반의 내부 분해이고,</text>
+<text x="30" y="161" font-size="10.5" fill="#dc2626">오른쪽 절반은 CPU 프로파일에 나타나지 않는다 (Kafka 클라이언트 메트릭으로 봐야 한다)</text>
+
+<!-- 단계별 -->
+<text x="30" y="192" font-size="12.5" font-weight="700" fill="#1e293b">② 이벤트 1건이 거치는 단계 (CPU 구간의 내부 분해)</text>
+
+<!-- 0. poll -->
+<rect x="30" y="206" width="560" height="44" rx="6" fill="#0284c7" fill-opacity="0.08" stroke="#0284c7" stroke-opacity="0.35"/>
+<text x="46" y="226" font-size="11.5" font-weight="700" fill="#0284c7">0. KafkaConsumer.poll()</text>
+<text x="46" y="242" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">브로커에서 최대 500건(max.poll.records 기본값) 배치로 가져온다</text>
+<rect x="604" y="216" width="70" height="24" rx="12" fill="#0284c7" fill-opacity="0.18"/>
+<text x="639" y="232" font-size="10.5" font-weight="700" fill="#0284c7" text-anchor="middle">11.6%</text>
+<text x="686" y="232" font-size="10" fill="#64748b">+ 대기 시간 대부분</text>
+
+<!-- 1. deserialize -->
+<rect x="30" y="258" width="560" height="44" rx="6" fill="#0284c7" fill-opacity="0.08" stroke="#0284c7" stroke-opacity="0.35"/>
+<text x="46" y="278" font-size="11.5" font-weight="700" fill="#0284c7">1. StringDeserializer</text>
+<text x="46" y="294" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">byte[] → String (key, value) · 설정 안 했으므로 Spring Boot 기본값</text>
+<text x="604" y="284" font-size="10" fill="#64748b">0번에 포함</text>
+
+<!-- 2. dispatch -->
+<rect x="30" y="310" width="560" height="44" rx="6" fill="#7c3aed" fill-opacity="0.08" stroke="#7c3aed" stroke-opacity="0.35"/>
+<text x="46" y="330" font-size="11.5" font-weight="700" fill="#7c3aed">2. Spring Kafka 컨테이너 → 리스너 메서드 호출</text>
+<text x="46" y="346" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">배치가 아니라 레코드 1건씩 onMessage() 호출 (단건 리스너)</text>
+<rect x="604" y="320" width="70" height="24" rx="12" fill="#7c3aed" fill-opacity="0.18"/>
+<text x="639" y="336" font-size="10.5" font-weight="700" fill="#7c3aed" text-anchor="middle">6.0%</text>
+
+<!-- 3. tombstone -->
+<rect x="30" y="362" width="560" height="34" rx="6" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8"/>
+<text x="46" y="383" font-size="11" fill="#1e293b" font-family="ui-monospace,Menlo,monospace">3. record.value() == null → return   (tombstone 무시)</text>
+<text x="604" y="383" font-size="10" fill="#64748b">≈ 0%</text>
+
+<!-- 4. json -->
+<rect x="30" y="404" width="560" height="44" rx="6" fill="#dc2626" fill-opacity="0.10" stroke="#dc2626" stroke-opacity="0.45"/>
+<text x="46" y="424" font-size="11.5" font-weight="700" fill="#dc2626">4. objectMapper.readValue(value, DebeziumEnvelope::class.java)</text>
+<text x="46" y="440" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">JSON 텍스트 → 객체 · 필드명·값마다 String 생성이 비용의 핵심</text>
+<rect x="604" y="414" width="70" height="24" rx="12" fill="#dc2626" fill-opacity="0.22"/>
+<text x="639" y="430" font-size="10.5" font-weight="700" fill="#dc2626" text-anchor="middle">54.1%</text>
+<text x="686" y="430" font-size="10" fill="#dc2626">← CPU 1순위</text>
+
+<!-- 5. detect -->
+<rect x="30" y="456" width="560" height="44" rx="6" fill="#059669" fill-opacity="0.08" stroke="#059669" stroke-opacity="0.35"/>
+<text x="46" y="476" font-size="11.5" font-weight="700" fill="#059669">5. changeDetector.detect(envelope)</text>
+<text x="46" y="492" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">before/after 비교 (BigDecimal.compareTo) + summary 문자열 생성</text>
+<rect x="604" y="466" width="70" height="24" rx="12" fill="#059669" fill-opacity="0.18"/>
+<text x="639" y="482" font-size="10.5" font-weight="700" fill="#059669" text-anchor="middle">3.3%</text>
+<text x="686" y="482" font-size="10" fill="#64748b">손댈 가치 없음</text>
+
+<!-- 6. store -->
+<rect x="30" y="508" width="560" height="34" rx="6" fill="#94a3b8" fill-opacity="0.08" stroke="#94a3b8"/>
+<text x="46" y="529" font-size="11" fill="#1e293b" font-family="ui-monospace,Menlo,monospace">6. eventStore.add(event)   @Synchronized · ArrayDeque</text>
+<rect x="604" y="514" width="70" height="22" rx="11" fill="#94a3b8" fill-opacity="0.18"/>
+<text x="639" y="529" font-size="10.5" font-weight="700" fill="#64748b" text-anchor="middle">0 샘플</text>
+<text x="686" y="529" font-size="10" fill="#64748b">락 경합 0건</text>
+
+<!-- 7. log -->
+<rect x="30" y="550" width="560" height="44" rx="6" fill="#d97706" fill-opacity="0.10" stroke="#d97706" stroke-opacity="0.45"/>
+<text x="46" y="570" font-size="11.5" font-weight="700" fill="#d97706">7. log.info("[CDC] ...")</text>
+<text x="46" y="586" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">logback → stdout · 30,000줄/s · 쓰기가 블로킹되면 대기로도 들어간다</text>
+<rect x="604" y="560" width="70" height="24" rx="12" fill="#d97706" fill-opacity="0.22"/>
+<text x="639" y="576" font-size="10.5" font-weight="700" fill="#d97706" text-anchor="middle">24.9%</text>
+<text x="686" y="576" font-size="10" fill="#d97706">A/B 검증 +19.8%</text>
+</svg>

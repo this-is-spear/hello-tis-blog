@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 700" width="880" height="700" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif" role="img">
+<title>CDC 파이프라인 — 구간마다 흐르는 데이터의 형태</title>
+<rect x="0.5" y="0.5" width="879" height="699" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+<defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="3.5" orient="auto"><path d="M0,0 L0,7 L9,3.5 z" fill="#94a3b8"/></marker></defs>
+
+<text x="30" y="34" font-size="15" font-weight="700" fill="#1e293b">CDC 파이프라인 — 구간마다 데이터의 모양이 바뀐다</text>
+<text x="30" y="54" font-size="11" fill="#64748b">오른쪽 배지는 실측 최대 처리량. 뒤 단계가 더 느리므로 그 구간에서 처리 대기가 누적된다.</text>
+
+<!-- ① 앱 -->
+<rect x="50" y="76" width="300" height="58" rx="8" fill="#0284c7" fill-opacity="0.10" stroke="#0284c7" stroke-opacity="0.45"/>
+<text x="68" y="101" font-size="13" font-weight="700" fill="#0284c7">Spring Boot 앱 (쓰기)</text>
+<text x="68" y="120" font-size="10.5" fill="#64748b">ProductService — CDC 를 전혀 모른다</text>
+
+<line x1="200" y1="138" x2="200" y2="198" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ar)"/>
+<text x="375" y="156" font-size="11.5" font-weight="700" fill="#1e293b">① SQL 문</text>
+<text x="375" y="176" font-size="10.5" fill="#1e293b" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">UPDATE products SET price=? WHERE id=?</text>
+<text x="375" y="192" font-size="10" fill="#64748b">JPA dirty checking 이 만든 평범한 UPDATE</text>
+
+<!-- ② MySQL -->
+<rect x="50" y="202" width="300" height="58" rx="8" fill="#0284c7" fill-opacity="0.10" stroke="#0284c7" stroke-opacity="0.45"/>
+<text x="68" y="227" font-size="13" font-weight="700" fill="#0284c7">MySQL 8.4</text>
+<text x="68" y="246" font-size="10.5" fill="#64748b">binlog — ROW 포맷</text>
+<rect x="256" y="216" width="82" height="22" rx="11" fill="#0284c7" fill-opacity="0.16"/>
+<text x="297" y="231" font-size="10" font-weight="700" fill="#0284c7" text-anchor="middle">196,296/s</text>
+
+<line x1="200" y1="264" x2="200" y2="324" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ar)"/>
+<text x="375" y="282" font-size="11.5" font-weight="700" fill="#1e293b">② binlog ROW 이벤트 (raw)</text>
+<text x="375" y="302" font-size="10.5" fill="#1e293b" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">before: [1, ?, 29000.00, 100, ..]</text>
+<text x="375" y="317" font-size="10" fill="#dc2626">컬럼 이름·타입이 없다 → 역직렬화에 스키마 메타데이터가 필요 (§3)</text>
+
+<!-- ③ Debezium -->
+<rect x="50" y="328" width="300" height="58" rx="8" fill="#7c3aed" fill-opacity="0.10" stroke="#7c3aed" stroke-opacity="0.45"/>
+<text x="68" y="353" font-size="13" font-weight="700" fill="#7c3aed">Debezium</text>
+<text x="68" y="372" font-size="10.5" fill="#64748b">Kafka Connect 플러그인 — replica 로 등록</text>
+<rect x="262" y="342" width="76" height="22" rx="11" fill="#7c3aed" fill-opacity="0.16"/>
+<text x="300" y="357" font-size="10" font-weight="700" fill="#7c3aed" text-anchor="middle">49,278/s</text>
+
+<line x1="200" y1="390" x2="200" y2="450" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ar)"/>
+<text x="375" y="408" font-size="11.5" font-weight="700" fill="#1e293b">③ JSON envelope</text>
+<text x="375" y="428" font-size="10.5" fill="#1e293b" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">{"op":"u", "before":{..}, "after":{..}, "source":{..}}</text>
+<text x="375" y="443" font-size="10" fill="#64748b">decimal.handling.mode=string 이라 price 가 문자열로 온다</text>
+
+<!-- ④ Kafka -->
+<rect x="50" y="454" width="300" height="58" rx="8" fill="#d97706" fill-opacity="0.10" stroke="#d97706" stroke-opacity="0.45"/>
+<text x="68" y="479" font-size="13" font-weight="700" fill="#d97706">Kafka</text>
+<text x="68" y="498" font-size="10.5" fill="#64748b">hello-cdc.inventory.products — 파티션 1개</text>
+<rect x="268" y="468" width="70" height="22" rx="11" fill="#d97706" fill-opacity="0.16"/>
+<text x="303" y="483" font-size="10" font-weight="700" fill="#d97706" text-anchor="middle">버퍼</text>
+
+<line x1="200" y1="516" x2="200" y2="576" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ar)"/>
+<text x="375" y="534" font-size="11.5" font-weight="700" fill="#1e293b">④ poll → 도메인 이벤트로 해석</text>
+<text x="375" y="554" font-size="10.5" fill="#1e293b" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">PRICE_CHANGED  29000.00 → 24900.00</text>
+<text x="375" y="569" font-size="10" fill="#64748b">before/after 비교는 Debezium 이 아니라 우리 코드의 몫 (§2.4)</text>
+
+<!-- ⑤ 컨슈머 -->
+<rect x="50" y="580" width="300" height="58" rx="8" fill="#059669" fill-opacity="0.10" stroke="#059669" stroke-opacity="0.45"/>
+<text x="68" y="605" font-size="13" font-weight="700" fill="#059669">@KafkaListener</text>
+<text x="68" y="624" font-size="10.5" fill="#64748b">ProductCdcListener — 스레드 1개</text>
+<rect x="262" y="594" width="76" height="22" rx="11" fill="#059669" fill-opacity="0.16"/>
+<text x="300" y="609" font-size="10" font-weight="700" fill="#059669" text-anchor="middle">30,110/s</text>
+
+<text x="30" y="672" font-size="10.5" fill="#64748b">앱은 CDC 를 모르고 UPDATE 만 한다. 그래서 앱을 우회한 SQL 변경도 똑같이 잡힌다 — 폴링 방식과의 결정적 차이.</text>
+</svg>

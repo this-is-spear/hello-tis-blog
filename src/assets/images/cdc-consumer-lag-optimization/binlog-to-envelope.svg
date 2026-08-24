@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 340" width="880" height="340" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif" role="img">
+<title>binlog ROW 이벤트가 Debezium envelope 로 변환되는 과정</title>
+<rect x="0.5" y="0.5" width="879" height="339" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+<text x="30" y="32" font-size="15" font-weight="700" fill="#1e293b">binlog ROW 이벤트에는 컬럼 이름이 없다 — 스키마 메타데이터가 필요한 이유</text>
+<text x="30" y="52" font-size="11" fill="#64748b">Debezium 이 재시작해도 과거 시점의 스키마로 역직렬화해야 하므로, DDL 이력을 Kafka 에 저장해 재생한다.</text>
+
+<rect x="30" y="76" width="250" height="150" rx="8" fill="#64748b" fill-opacity="0.07" stroke="#94a3b8"/>
+<text x="46" y="98" font-size="11.5" font-weight="700" fill="#1e293b">① binlog ROW 이벤트 (raw)</text>
+<text x="46" y="122" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">table_id: 108</text>
+<text x="46" y="140" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">before: [1, ?, 29000.00, 100, ..]</text>
+<text x="46" y="158" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">after:  [1, ?, 24900.00, 100, ..]</text>
+<text x="46" y="184" font-size="10" fill="#dc2626">컬럼 이름 없음</text>
+<text x="46" y="200" font-size="10" fill="#dc2626">타입·스케일 없음 (순서만 있음)</text>
+
+<rect x="315" y="76" width="250" height="150" rx="8" fill="#7c3aed" fill-opacity="0.07" stroke="#7c3aed" stroke-opacity="0.45"/>
+<text x="331" y="98" font-size="11.5" font-weight="700" fill="#7c3aed">② 스키마 히스토리 (메타데이터)</text>
+<text x="331" y="118" font-size="9.5" fill="#64748b">schema-changes.inventory 토픽</text>
+<text x="331" y="140" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">name: "price"</text>
+<text x="331" y="157" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">typeName: "DECIMAL"</text>
+<text x="331" y="174" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">length: 12  scale: 2</text>
+<text x="331" y="191" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">position: 3</text>
+<text x="331" y="212" font-size="10" fill="#059669">position 3 = 세 번째 컬럼이 price</text>
+
+<rect x="600" y="76" width="250" height="150" rx="8" fill="#059669" fill-opacity="0.07" stroke="#059669" stroke-opacity="0.45"/>
+<text x="616" y="98" font-size="11.5" font-weight="700" fill="#059669">③ Debezium envelope</text>
+<text x="616" y="122" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">"op": "u",</text>
+<text x="616" y="139" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">"before": {"price": "29000.00"},</text>
+<text x="616" y="156" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">"after":  {"price": "24900.00"},</text>
+<text x="616" y="173" font-size="10" fill="#64748b" font-family="ui-monospace,Menlo,monospace">"source": {"file","pos"}</text>
+<text x="616" y="200" font-size="10" fill="#059669">decimal.handling.mode=string</text>
+<text x="616" y="215" font-size="10" fill="#64748b">덕분에 base64 대신 문자열</text>
+
+<defs><marker id="b" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#94a3b8"/></marker></defs>
+<line x1="440" y1="240" x2="440" y2="262" stroke="#94a3b8" stroke-width="1.8"/>
+<line x1="155" y1="240" x2="155" y2="252" stroke="#94a3b8" stroke-width="1.8"/>
+<line x1="155" y1="252" x2="725" y2="252" stroke="#94a3b8" stroke-width="1.8"/>
+<line x1="725" y1="252" x2="725" y2="240" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#b)"/>
+<text x="440" y="286" font-size="11.5" fill="#1e293b" text-anchor="middle" font-weight="600">raw 행 이미지 + 스키마 메타데이터 = 필드명이 붙은 before/after</text>
+<text x="440" y="310" font-size="10.5" fill="#64748b" text-anchor="middle">ALTER TABLE 로 스키마가 바뀌면, 각 binlog 위치마다 그 시점의 스키마가 필요하다 → 그래서 이력으로 보관한다</text>
+</svg>
