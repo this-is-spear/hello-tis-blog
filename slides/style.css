@@ -1,0 +1,4 @@
+/* 개발 모드에서 우측에 상시 노출되는 Goto 자동완성 패널 숨김 */
+.autocomplete-list {
+  display: none !important;
+}

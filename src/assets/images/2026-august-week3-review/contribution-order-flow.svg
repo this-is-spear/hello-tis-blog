@@ -1,0 +1,48 @@
+<svg viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif" role="img" aria-label="오타에서 유지 작업까지 기여 순서 도식">
+  <rect x="0.5" y="0.5" width="759" height="189" rx="8" fill="#fcfcfb" stroke="rgba(11,11,11,0.10)"/>
+
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="#a3a3a3"/>
+    </marker>
+  </defs>
+
+  <g font-size="14" text-anchor="middle">
+    <g>
+      <rect x="20" y="52" width="120" height="62" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+      <text x="80" y="80" fill="#0b0b0b" font-weight="600">오타</text>
+      <text x="80" y="100" fill="#52514e" font-size="12">#897</text>
+    </g>
+    <g>
+      <rect x="170" y="52" width="120" height="62" rx="8" fill="#dbeafe" stroke="#bfdbfe"/>
+      <text x="230" y="80" fill="#0b0b0b" font-weight="600">문서 번역</text>
+      <text x="230" y="100" fill="#52514e" font-size="12">#878+</text>
+    </g>
+    <g>
+      <rect x="320" y="52" width="120" height="62" rx="8" fill="#bfdbfe" stroke="#93c5fd"/>
+      <text x="380" y="80" fill="#0b0b0b" font-weight="600">이슈 제안</text>
+      <text x="380" y="100" fill="#52514e" font-size="12">#962</text>
+    </g>
+    <g>
+      <rect x="470" y="52" width="120" height="62" rx="8" fill="#3b82f6" stroke="#2563eb"/>
+      <text x="530" y="80" fill="#ffffff" font-weight="600">기능 구현</text>
+      <text x="530" y="100" fill="#e0edff" font-size="12">#929</text>
+    </g>
+    <g>
+      <rect x="620" y="52" width="120" height="62" rx="8" fill="#1d4ed8" stroke="#1e40af"/>
+      <text x="680" y="80" fill="#ffffff" font-weight="600">유지 작업</text>
+      <text x="680" y="100" fill="#dbeafe" font-size="12">#967+</text>
+    </g>
+  </g>
+
+  <g stroke="#a3a3a3" stroke-width="1.5" marker-end="url(#arrow)">
+    <line x1="142" y1="83" x2="164" y2="83"/>
+    <line x1="292" y1="83" x2="314" y2="83"/>
+    <line x1="442" y1="83" x2="464" y2="83"/>
+    <line x1="592" y1="83" x2="614" y2="83"/>
+  </g>
+
+  <text x="20" y="32" font-size="12" fill="#52514e">메인테이너 손이 덜 타는 일</text>
+  <text x="740" y="32" font-size="12" fill="#52514e" text-anchor="end">프로젝트 이해도가 필요한 일</text>
+  <text x="380" y="152" font-size="12" fill="#52514e" text-anchor="middle">기여 빈도와 기간이 쌓이는 방향</text>
+</svg>
