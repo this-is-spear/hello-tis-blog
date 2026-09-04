@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1040" height="970" viewBox="0 0 1040 970" role="img" aria-labelledby="title desc">
   <title id="title">MVP 실행 플랫폼의 시스템 아키텍처</title>
-  <desc id="desc">사용자는 Nginx Proxy Manager를 통해 API와 Preview에 접근한다. API에는 사용자 포털, 플랫폼 제어, Webhook 수신이 함께 있다. GitHub 변경은 Webhook과 별도 Poller로 감지해 PostgreSQL 작업 큐에 저장한다. 별도 워커는 작업을 가져와 코드를 빌드하고 테스트한 뒤 Preview에 배포한다. 모든 실행 단위는 개인 홈 서버와 Docker 데몬을 공유한다.</desc>
+  <desc id="desc">접근 계층의 Nginx가 사용자 요청을 API와 서비스 실행 계층의 Preview로 전달한다. API에는 사용자 포털 계층, 플랫폼 제어 계층, 변경 감지 계층의 Webhook 수신이 함께 있다. 변경 감지 계층의 Poller는 별도 프로세스에서 동작한다. 상태 저장 계층의 PostgreSQL 큐에 등록된 작업을 배포 실행 계층의 워커가 가져와 빌드·테스트 후 Preview에 배포한다. 모든 실행 단위는 개인 홈 서버와 Docker 데몬을 공유한다.</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0 0 10 5 0 10Z" fill="#566575"/>
@@ -33,8 +33,9 @@
   <text x="870" y="214" class="label">최신 커밋 조회</text>
 
   <rect x="60" y="310" width="220" height="100" rx="10" class="unit"/>
-  <text x="170" y="348" class="body" font-weight="700" text-anchor="middle">Nginx Proxy Manager</text>
-  <text x="170" y="382" class="body" text-anchor="middle">TLS · 호스트 라우팅</text>
+  <text x="170" y="342" class="name" text-anchor="middle">접근 계층</text>
+  <text x="170" y="368" class="label" text-anchor="middle">Nginx Proxy Manager</text>
+  <text x="170" y="393" class="label" text-anchor="middle">TLS · 호스트 라우팅</text>
   <path d="M280 350H360" class="edge"/>
   <path d="M170 410V730" class="edge"/>
   <text x="184" y="596" class="label">Preview 접속</text>
@@ -43,13 +44,14 @@
   <text x="385" y="337" class="name">API</text>
   <text x="707" y="337" class="label" text-anchor="end">하나의 프로세스</text>
   <path d="M380 354H710" stroke="#c3d5e3"/>
-  <text x="385" y="389" class="body">사용자 포털 · 로그인과 권한 확인</text>
-  <text x="385" y="427" class="body">플랫폼 제어 · 프로젝트와 배포 관리</text>
-  <text x="385" y="465" class="body">Webhook 수신 · 변경 감지</text>
+  <text x="385" y="389" class="body">사용자 포털 계층 · 로그인·권한</text>
+  <text x="385" y="427" class="body">플랫폼 제어 계층 · 프로젝트·배포</text>
+  <text x="385" y="465" class="body">변경 감지 계층 · Webhook</text>
 
   <rect x="800" y="310" width="180" height="100" rx="10" class="unit"/>
-  <text x="890" y="350" class="name" text-anchor="middle">Poller</text>
-  <text x="890" y="382" class="body" text-anchor="middle">변경 감지 보완</text>
+  <text x="890" y="342" class="name" text-anchor="middle">변경 감지 계층</text>
+  <text x="890" y="368" class="label" text-anchor="middle">Poller</text>
+  <text x="890" y="393" class="label" text-anchor="middle">Webhook 누락 보완</text>
 
   <path d="M545 490V580" class="edge"/>
   <text x="560" y="536" class="label">상태 조회 · 작업 등록</text>
@@ -57,22 +59,25 @@
   <text x="877" y="556" class="label" text-anchor="end">누락된 작업 등록</text>
 
   <rect x="420" y="580" width="250" height="100" rx="12" fill="#fff7e8" stroke="#bc9c61" stroke-width="2"/>
-  <text x="545" y="620" class="name" text-anchor="middle">PostgreSQL</text>
-  <text x="545" y="653" class="body" text-anchor="middle">영속 작업 큐 · 상태 · 이력</text>
+  <text x="545" y="612" class="name" text-anchor="middle">상태 저장 계층</text>
+  <text x="545" y="638" class="label" text-anchor="middle">PostgreSQL</text>
+  <text x="545" y="663" class="label" text-anchor="middle">영속 작업 큐 · 상태 · 이력</text>
 
   <path d="M670 657H750V762H800" class="edge" marker-start="url(#arrow)"/>
   <text x="735" y="707" class="label" text-anchor="end">작업 획득</text>
   <text x="735" y="732" class="label" text-anchor="end">결과 저장</text>
 
   <rect x="800" y="730" width="180" height="100" rx="10" fill="#f4effb" stroke="#9c85bb" stroke-width="2"/>
-  <text x="890" y="768" class="name" text-anchor="middle">워커</text>
-  <text x="890" y="799" class="label" text-anchor="middle">checkout · build · test</text>
+  <text x="890" y="762" class="name" text-anchor="middle">배포 실행 계층</text>
+  <text x="890" y="788" class="label" text-anchor="middle">워커</text>
+  <text x="890" y="813" class="label" text-anchor="middle">checkout · build · test</text>
   <path d="M800 800H360" class="edge"/>
   <text x="545" y="785" class="label" text-anchor="middle">Preview 배포 · 실패 시 복구 시도</text>
 
   <rect x="60" y="730" width="300" height="100" rx="10" fill="#eef7f0" stroke="#7aa087" stroke-width="2"/>
-  <text x="210" y="768" class="name" text-anchor="middle">프로젝트별 Preview</text>
-  <text x="210" y="799" class="body" text-anchor="middle">앱 컨테이너 · /data 볼륨</text>
+  <text x="210" y="762" class="name" text-anchor="middle">서비스 실행 계층</text>
+  <text x="210" y="788" class="label" text-anchor="middle">프로젝트별 Preview 컨테이너</text>
+  <text x="210" y="813" class="label" text-anchor="middle">/data 볼륨</text>
 
   <text x="60" y="932" class="body">API 내부는 같은 장애 단위 · Poller와 워커는 별도 프로세스 · 호스트 장애는 전체에 영향</text>
 </svg>
