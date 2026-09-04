@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1090" viewBox="0 0 1040 1090" role="img" aria-labelledby="title desc">
+  <title id="title">MVP 실행 플랫폼의 계층별 아키텍처</title>
+  <desc id="desc">접근, 사용자 포털, 플랫폼 제어, 변경 감지, 상태 저장, 배포 실행, 서비스 실행 계층을 각각 상자로 표시했다. 사용자 포털과 플랫폼 제어, 변경 감지의 Webhook 수신은 API 프로세스 경계 안에 있다. 변경 감지의 Poller는 별도 프로세스다. 배포 작업은 PostgreSQL에 저장하고 워커가 가져와 Preview에 배포한다. 모든 프로세스는 하나의 홈 서버를 공유한다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10Z" fill="#566575"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; fill: #243442; }
+      .name { font-size: 23px; font-weight: 700; }
+      .body { font-size: 19px; }
+      .label { font-size: 17px; fill: #4e6070; }
+      .edge { fill: none; stroke: #566575; stroke-width: 2.2; marker-end: url(#arrow); stroke-linejoin: round; }
+      .layer { stroke-width: 1.6; }
+    </style>
+  </defs>
+  <rect width="1040" height="1090" rx="12" fill="#fafbf9"/>
+  <text x="60" y="48" class="name">MVP 실행 플랫폼 · 계층별 구조</text>
+  <rect x="60" y="90" width="220" height="80" rx="10" fill="#fff" stroke="#8c9ba8"/>
+  <text x="170" y="138" class="name" text-anchor="middle">사용자</text>
+  <rect x="730" y="90" width="250" height="80" rx="10" fill="#fff" stroke="#8c9ba8"/>
+  <text x="855" y="125" class="name" text-anchor="middle">GitHub</text>
+  <text x="855" y="152" class="label" text-anchor="middle">인증 · 프로젝트 저장소</text>
+
+  <rect x="20" y="240" width="1000" height="790" rx="14" fill="#f0f3f0" stroke="#a8b3ac" stroke-width="1.5"/>
+  <text x="330" y="276" class="body" font-weight="700">개인 홈 서버 · 단일 Docker 데몬</text>
+  <rect x="330" y="300" width="440" height="310" rx="12" fill="#fff" stroke="#8196a7" stroke-width="1.8" stroke-dasharray="7 5"/>
+
+  <path d="M170 170V310" class="edge"/>
+  <text x="185" y="215" class="label">HTTPS</text>
+  <path d="M780 170V548H750" class="edge"/>
+  <text x="765" y="215" class="label" text-anchor="end">Push Webhook</text>
+  <path d="M890 310V170" class="edge"/>
+  <text x="905" y="215" class="label">커밋 조회</text>
+
+  <rect x="60" y="310" width="220" height="100" rx="10" fill="#fff" stroke="#8c9ba8" class="layer"/>
+  <text x="170" y="342" class="name" text-anchor="middle">접근 계층</text>
+  <text x="170" y="368" class="label" text-anchor="middle">Nginx Proxy Manager</text>
+  <text x="170" y="393" class="label" text-anchor="middle">TLS · 호스트 라우팅</text>
+  <path d="M280 350H310V386H350" class="edge"/>
+  <path d="M170 410V880" class="edge"/>
+  <text x="184" y="820" class="label">Preview 접속</text>
+
+  <text x="350" y="333" class="body" font-weight="700">API 프로세스</text>
+  <text x="749" y="333" class="label" text-anchor="end">같은 장애 단위</text>
+
+  <rect x="350" y="355" width="400" height="65" rx="8" fill="#eef5fb" stroke="#6c91b0" class="layer"/>
+  <text x="550" y="381" class="name" text-anchor="middle">사용자 포털 계층</text>
+  <text x="550" y="406" class="label" text-anchor="middle">화면 · GitHub OAuth · 세션 · 권한 확인</text>
+  <path d="M550 420V435" class="edge"/>
+
+  <rect x="350" y="435" width="400" height="65" rx="8" fill="#eef5fb" stroke="#6c91b0" class="layer"/>
+  <text x="550" y="461" class="name" text-anchor="middle">플랫폼 제어 계층</text>
+  <text x="550" y="486" class="label" text-anchor="middle">프로젝트 생성 · 배포 요청 · 상태 관리</text>
+  <path d="M350 468H300V731H420" class="edge"/>
+  <text x="315" y="664" class="label">상태 관리</text>
+
+  <rect x="350" y="515" width="400" height="65" rx="8" fill="#eaf6f4" stroke="#68a199" class="layer"/>
+  <text x="550" y="541" class="name" text-anchor="middle">변경 감지 계층</text>
+  <text x="550" y="566" class="label" text-anchor="middle">Webhook 수신 · main 변경 감지</text>
+  <path d="M550 580V680" class="edge"/>
+  <text x="565" y="646" class="label">배포 작업 등록</text>
+
+  <rect x="800" y="310" width="180" height="100" rx="10" fill="#eaf6f4" stroke="#68a199" class="layer"/>
+  <text x="890" y="342" class="name" text-anchor="middle">변경 감지 계층</text>
+  <text x="890" y="368" class="label" text-anchor="middle">Poller 프로세스</text>
+  <text x="890" y="393" class="label" text-anchor="middle">Webhook 누락 보완</text>
+  <path d="M890 410V711H670" class="edge"/>
+  <text x="876" y="658" class="label" text-anchor="end">누락된 작업 등록</text>
+
+  <rect x="420" y="680" width="250" height="100" rx="10" fill="#fff7e8" stroke="#bc9c61" class="layer"/>
+  <text x="545" y="712" class="name" text-anchor="middle">상태 저장 계층</text>
+  <text x="545" y="738" class="label" text-anchor="middle">PostgreSQL</text>
+  <text x="545" y="763" class="label" text-anchor="middle">영속 작업 큐 · 상태 · 이력</text>
+  <path d="M670 757H750V912H800" class="edge" marker-start="url(#arrow)"/>
+  <text x="735" y="825" class="label" text-anchor="end">작업 획득</text>
+  <text x="735" y="850" class="label" text-anchor="end">결과 저장</text>
+
+  <rect x="800" y="880" width="180" height="110" rx="10" fill="#f4effb" stroke="#9c85bb" class="layer"/>
+  <text x="890" y="912" class="name" text-anchor="middle">배포 실행 계층</text>
+  <text x="890" y="938" class="label" text-anchor="middle">워커 프로세스</text>
+  <text x="890" y="966" class="label" text-anchor="middle">checkout · build · test</text>
+  <path d="M800 958H370" class="edge"/>
+  <text x="560" y="942" class="label" text-anchor="middle">배포 · Ready 확인 · 복구 시도</text>
+
+  <rect x="60" y="880" width="310" height="110" rx="10" fill="#eef7f0" stroke="#7aa087" class="layer"/>
+  <text x="215" y="912" class="name" text-anchor="middle">서비스 실행 계층</text>
+  <text x="215" y="938" class="label" text-anchor="middle">프로젝트별 Preview 컨테이너</text>
+  <text x="215" y="966" class="label" text-anchor="middle">/data 볼륨</text>
+
+  <text x="60" y="1066" class="body">상자는 책임 계층 · 점선은 공유 API 프로세스 · 변경 감지 계층은 Webhook과 Poller로 구성</text>
+</svg>
