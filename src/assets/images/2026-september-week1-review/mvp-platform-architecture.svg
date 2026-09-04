@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="970" viewBox="0 0 1040 970" role="img" aria-labelledby="title desc">
+  <title id="title">MVP 실행 플랫폼의 시스템 아키텍처</title>
+  <desc id="desc">사용자는 Nginx Proxy Manager를 통해 API와 Preview에 접근한다. API에는 사용자 포털, 플랫폼 제어, Webhook 수신이 함께 있다. GitHub 변경은 Webhook과 별도 Poller로 감지해 PostgreSQL 작업 큐에 저장한다. 별도 워커는 작업을 가져와 코드를 빌드하고 테스트한 뒤 Preview에 배포한다. 모든 실행 단위는 개인 홈 서버와 Docker 데몬을 공유한다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 10 5 0 10Z" fill="#566575"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; fill: #243442; }
+      .name { font-size: 23px; font-weight: 700; }
+      .body { font-size: 19px; }
+      .label { font-size: 17px; fill: #4e6070; }
+      .edge { fill: none; stroke: #566575; stroke-width: 2.2; marker-end: url(#arrow); stroke-linejoin: round; }
+      .unit { fill: #fff; stroke: #8c9ba8; stroke-width: 1.5; }
+    </style>
+  </defs>
+  <rect width="1040" height="970" rx="12" fill="#fafbf9"/>
+  <text x="60" y="48" class="name">MVP 실행 플랫폼</text>
+  <rect x="60" y="90" width="220" height="80" rx="10" class="unit"/>
+  <text x="170" y="138" class="name" text-anchor="middle">사용자</text>
+  <rect x="730" y="90" width="250" height="80" rx="10" class="unit"/>
+  <text x="855" y="125" class="name" text-anchor="middle">GitHub</text>
+  <text x="855" y="152" class="label" text-anchor="middle">로그인 · 프로젝트 저장소</text>
+
+  <rect x="20" y="240" width="1000" height="650" rx="14" fill="#f0f3f0" stroke="#a8b3ac" stroke-width="1.5" stroke-dasharray="7 6"/>
+  <text x="360" y="273" class="body" font-weight="700">개인 홈 서버 · 단일 Docker 데몬</text>
+
+  <path d="M170 170V310" class="edge"/>
+  <text x="185" y="214" class="label">HTTPS</text>
+  <path d="M730 130H700V300" class="edge"/>
+  <text x="684" y="206" class="label" text-anchor="end">OAuth · Webhook</text>
+  <path d="M855 310V170" class="edge"/>
+  <text x="870" y="214" class="label">최신 커밋 조회</text>
+
+  <rect x="60" y="310" width="220" height="100" rx="10" class="unit"/>
+  <text x="170" y="348" class="body" font-weight="700" text-anchor="middle">Nginx Proxy Manager</text>
+  <text x="170" y="382" class="body" text-anchor="middle">TLS · 호스트 라우팅</text>
+  <path d="M280 350H360" class="edge"/>
+  <path d="M170 410V730" class="edge"/>
+  <text x="184" y="596" class="label">Preview 접속</text>
+
+  <rect x="360" y="300" width="370" height="190" rx="12" fill="#eef5fb" stroke="#6c91b0" stroke-width="2"/>
+  <text x="385" y="337" class="name">API</text>
+  <text x="707" y="337" class="label" text-anchor="end">하나의 프로세스</text>
+  <path d="M380 354H710" stroke="#c3d5e3"/>
+  <text x="385" y="389" class="body">사용자 포털 · 로그인과 권한 확인</text>
+  <text x="385" y="427" class="body">플랫폼 제어 · 프로젝트와 배포 관리</text>
+  <text x="385" y="465" class="body">Webhook 수신 · 변경 감지</text>
+
+  <rect x="800" y="310" width="180" height="100" rx="10" class="unit"/>
+  <text x="890" y="350" class="name" text-anchor="middle">Poller</text>
+  <text x="890" y="382" class="body" text-anchor="middle">변경 감지 보완</text>
+
+  <path d="M545 490V580" class="edge"/>
+  <text x="560" y="536" class="label">상태 조회 · 작업 등록</text>
+  <path d="M890 410V625H670" class="edge"/>
+  <text x="877" y="556" class="label" text-anchor="end">누락된 작업 등록</text>
+
+  <rect x="420" y="580" width="250" height="100" rx="12" fill="#fff7e8" stroke="#bc9c61" stroke-width="2"/>
+  <text x="545" y="620" class="name" text-anchor="middle">PostgreSQL</text>
+  <text x="545" y="653" class="body" text-anchor="middle">영속 작업 큐 · 상태 · 이력</text>
+
+  <path d="M670 657H750V762H800" class="edge" marker-start="url(#arrow)"/>
+  <text x="735" y="707" class="label" text-anchor="end">작업 획득</text>
+  <text x="735" y="732" class="label" text-anchor="end">결과 저장</text>
+
+  <rect x="800" y="730" width="180" height="100" rx="10" fill="#f4effb" stroke="#9c85bb" stroke-width="2"/>
+  <text x="890" y="768" class="name" text-anchor="middle">워커</text>
+  <text x="890" y="799" class="label" text-anchor="middle">checkout · build · test</text>
+  <path d="M800 800H360" class="edge"/>
+  <text x="545" y="785" class="label" text-anchor="middle">Preview 배포 · 실패 시 복구 시도</text>
+
+  <rect x="60" y="730" width="300" height="100" rx="10" fill="#eef7f0" stroke="#7aa087" stroke-width="2"/>
+  <text x="210" y="768" class="name" text-anchor="middle">프로젝트별 Preview</text>
+  <text x="210" y="799" class="body" text-anchor="middle">앱 컨테이너 · /data 볼륨</text>
+
+  <text x="60" y="932" class="body">API 내부는 같은 장애 단위 · Poller와 워커는 별도 프로세스 · 호스트 장애는 전체에 영향</text>
+</svg>
