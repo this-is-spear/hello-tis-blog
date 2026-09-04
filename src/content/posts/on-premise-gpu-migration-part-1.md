@@ -4,6 +4,7 @@ description: 클라우드 GPU 비용을 줄이기 위해 로컬 PoC와 개발 �
 pubDatetime: 2026-02-20T00:00:00Z
 tags:
   - AI
+aiCategory: features
 ---
 
 ## 개요

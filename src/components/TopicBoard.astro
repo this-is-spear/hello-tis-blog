@@ -1,78 +1,69 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import config from "@/config";
-import type { TopicGroup } from "@/utils/getTopicGroups";
 import { getPostUrl } from "@/utils/getPostPaths";
 
-type Props = {
-  groups: TopicGroup[];
-};
-
-const { groups } = Astro.props;
-
-const locale = Astro.currentLocale ?? config.site.lang;
-const visibleGroups = groups.filter(group => group.count > 0);
-
-type DisplayPost = {
-  post: CollectionEntry<"posts">;
-  topicName: string;
-};
-
-type DisplayGroup = {
-  name: string;
+type Props = { posts: CollectionEntry<"posts">[] };
+type TopicTag = {
   slug: string;
-  count: number;
-  posts: DisplayPost[];
+  name: string;
+  topic: CollectionEntry<"posts">["data"]["tags"][number];
 };
 
-const operationsAndPlatform = visibleGroups.filter(
-  group => group.name === "Operations" || group.name === "Platform"
-);
-const combinedPosts = operationsAndPlatform
-  .flatMap(group => group.posts.map(post => ({ post, topicName: group.name })))
-  .sort(
-    (a, b) =>
-      b.post.data.pubDatetime.getTime() - a.post.data.pubDatetime.getTime()
-  );
-
-const unorderedDisplayGroups: DisplayGroup[] = [
-  ...(combinedPosts.length > 0
-    ? [
-        {
-          name: "Platform",
-          slug: "platform",
-          count: combinedPosts.length,
-          posts: combinedPosts,
-        },
-      ]
-    : []),
-  ...visibleGroups
-    .filter(group => !operationsAndPlatform.includes(group))
-    .map(group => ({
-      name: group.name,
-      slug: group.slug,
-      count: group.count,
-      posts: group.posts.map(post => ({ post, topicName: group.name })),
-    })),
+const { posts } = Astro.props;
+const locale = Astro.currentLocale ?? config.site.lang;
+const categoryPosts = posts.filter(post => !post.data.hideFromCategories);
+const definitions: { slug: string; name: string; tags: TopicTag[] }[] = [
+  {
+    slug: "development",
+    name: "개발",
+    tags: [
+      { slug: "operations", name: "운영", topic: "Operations" },
+      { slug: "platform", name: "플랫폼", topic: "Platform" },
+      { slug: "product", name: "제품", topic: "Product" },
+      { slug: "study", name: "학습", topic: "Study" },
+    ],
+  },
+  {
+    slug: "review",
+    name: "회고",
+    tags: [
+      { slug: "weekly-review", name: "주간 회고", topic: "Weekly Review" },
+      { slug: "annual-review", name: "연간 회고", topic: "Annual Review" },
+    ],
+  },
+  {
+    slug: "ai",
+    name: "AI",
+    tags: [
+      { slug: "features", name: "AI 기능 개발", topic: "AI" },
+      { slug: "ax", name: "AX · 업무 자동화", topic: "AI" },
+    ],
+  },
 ];
 
-const displayGroupOrder = [
-  "Annual Review",
-  "Weekly Review",
-  "Product",
-  "Platform",
-  "AI",
-  "Study",
-];
-const displayGroups = unorderedDisplayGroups.sort(
-  (a, b) =>
-    displayGroupOrder.indexOf(a.name) - displayGroupOrder.indexOf(b.name)
-);
-
-const totalPostCount = displayGroups.reduce(
-  (count, group) => count + group.count,
-  0
-);
+const groups = definitions.map(group => {
+  const entries = categoryPosts.flatMap(post => {
+    const tag = group.tags.find(
+      tag =>
+        post.data.tags[0] === tag.topic &&
+        (tag.topic !== "AI" ||
+          tag.slug === (post.data.aiCategory ?? "features"))
+    );
+    return tag ? [{ post, tag }] : [];
+  });
+  return {
+    ...group,
+    entries,
+    filters: [
+      { slug: "all", name: "전체", count: entries.length },
+      ...group.tags.map(tag => ({
+        ...tag,
+        count: entries.filter(entry => entry.tag.slug === tag.slug).length,
+      })),
+    ],
+  };
+});
 
 const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   year: "numeric",
@@ -87,169 +78,249 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   data-topic-board
   class="relative left-1/2 w-[calc(100vw-2rem)] max-w-7xl -translate-x-1/2 pt-5 pb-2"
 >
-  <div class="mb-3">
+  <div class="mb-5">
     <h1 class="text-2xl font-semibold tracking-wide">Posts</h1>
     <p class="text-muted-foreground mt-1 text-sm">
-      주제를 선택하면 관련 글만 모아볼 수 있습니다.
+      관심 있는 주제를 고르고, 태그로 글을 찾아보세요.
     </p>
   </div>
 
-  <nav aria-label="글 주제 필터" class="mb-4 flex flex-wrap gap-2">
-    <button
-      type="button"
-      data-topic-filter="all"
-      data-topic-name="전체"
-      aria-pressed="true"
-      class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
-    >
-      <span>전체</span>
-      <span data-filter-count class="text-muted-foreground text-xs">
-        {totalPostCount}
-      </span>
-    </button>
+  <div
+    role="tablist"
+    aria-label="글 주제"
+    class="border-border mb-5 flex gap-2 border-b"
+  >
     {
-      displayGroups.map(group => (
+      groups.map((group, index) => (
         <button
           type="button"
-          data-topic-filter={group.slug}
-          data-topic-name={group.name}
-          aria-pressed="false"
-          class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+          role="tab"
+          id={`tab-${group.slug}`}
+          data-topic-tab={group.slug}
+          aria-selected={index === 0 ? "true" : "false"}
+          aria-controls={`panel-${group.slug}`}
+          tabindex={index === 0 ? 0 : -1}
+          class="text-muted-foreground hover:text-foreground -mb-px inline-flex items-center gap-2 border-b-2 border-transparent px-4 py-3 text-base font-semibold transition-colors"
         >
-          <span>{group.name}</span>
-          <span data-filter-count class="text-muted-foreground text-xs">
-            {group.count}
+          {group.name}
+          <span class="text-xs font-normal opacity-70">
+            {group.entries.length}
           </span>
         </button>
       ))
     }
-  </nav>
+  </div>
 
-  <p data-filter-status class="sr-only" aria-live="polite">
-    전체 글 {totalPostCount}개
+  <p data-filter-status class="sr-only" aria-live="polite" aria-atomic="true">
+    {groups[0].name} 전체 글 {groups[0].entries.length}개
   </p>
 
-  <div data-topic-groups class="space-y-8">
-    {
-      displayGroups.map(group => (
-        <section
-          data-topic-section
-          data-topic={group.slug}
-          aria-labelledby={`topic-${group.slug}`}
-          class="border-border border-t pt-4"
+  {
+    groups.map((group, index) => (
+      <section
+        role="tabpanel"
+        id={`panel-${group.slug}`}
+        aria-labelledby={`tab-${group.slug}`}
+        data-topic-panel={group.slug}
+        data-topic-name={group.name}
+        tabindex="0"
+        hidden={index !== 0}
+      >
+        <nav
+          aria-label={`${group.name} 세부 태그`}
+          class="mb-5 flex flex-wrap gap-2"
         >
-          <div class="mb-3 flex items-baseline gap-2">
-            <h2 id={`topic-${group.slug}`} class="text-xl font-semibold">
-              {group.name}
-            </h2>
-            <span class="text-muted-foreground text-sm">
-              글 {group.count}개
-            </span>
-          </div>
+          {group.filters.map(filter => (
+            <button
+              type="button"
+              data-tag-filter={filter.slug}
+              data-tag-name={filter.name}
+              aria-pressed={filter.slug === "all" ? "true" : "false"}
+              class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+            >
+              {filter.name}
+              <span data-filter-count class="text-xs opacity-70">
+                {filter.count}
+              </span>
+            </button>
+          ))}
+        </nav>
 
-          <div data-post-grid class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {group.posts.map(({ post, topicName }) => (
-              <article
-                data-post-card
-                class="border-border bg-background hover:border-accent/60 focus-within:border-accent group min-h-56 rounded-xl border transition-colors"
+        <div data-post-grid class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {group.entries.map(({ post, tag }) => (
+            <article
+              data-post-card
+              data-post-tag={tag.slug}
+              class="border-border bg-background hover:border-accent/60 focus-within:border-accent group min-h-56 rounded-xl border transition-colors"
+            >
+              <a
+                href={getPostUrl(post.id, post.filePath, locale)}
+                class="flex min-h-56 w-full flex-col p-4 no-underline"
+                aria-label={`${post.data.title} 글 읽기`}
               >
-                <a
-                  href={getPostUrl(post.id, post.filePath, locale)}
-                  class="flex min-h-56 w-full flex-col p-4 no-underline"
-                  aria-label={`${post.data.title} 글 읽기`}
-                >
-                  <div class="mb-3 flex items-center justify-between gap-3">
-                    <span class="bg-muted rounded-full px-2.5 py-1 text-xs font-medium">
-                      {topicName}
-                    </span>
-                    <time
-                      datetime={post.data.pubDatetime.toISOString()}
-                      class="text-muted-foreground text-xs whitespace-nowrap"
-                    >
-                      {dateFormatter.format(post.data.pubDatetime)}
-                    </time>
-                  </div>
-
-                  <h3 class="group-hover:text-accent mb-2 text-base leading-6 font-semibold transition-colors">
-                    {post.data.title}
-                  </h3>
-                  <p class="text-muted-foreground line-clamp-2 text-sm leading-6">
-                    {post.data.description}
-                  </p>
-
-                  <span class="text-accent mt-auto pt-4 text-sm font-medium">
-                    읽어보기 →
+                <div class="mb-3 flex items-center justify-between gap-3">
+                  <span class="bg-muted rounded-full px-2.5 py-1 text-xs font-medium">
+                    {tag.name}
                   </span>
-                </a>
-              </article>
-            ))}
-          </div>
-        </section>
-      ))
-    }
-  </div>
+                  <time
+                    datetime={post.data.pubDatetime.toISOString()}
+                    class="text-muted-foreground text-xs whitespace-nowrap"
+                  >
+                    {dateFormatter.format(post.data.pubDatetime)}
+                  </time>
+                </div>
+                <h2 class="group-hover:text-accent mb-2 text-base leading-6 font-semibold transition-colors">
+                  {post.data.title}
+                </h2>
+                <p class="text-muted-foreground line-clamp-2 text-sm leading-6">
+                  {post.data.description}
+                </p>
+                <span class="text-accent mt-auto pt-4 text-sm font-medium">
+                  읽어보기 →
+                </span>
+              </a>
+            </article>
+          ))}
+        </div>
+        <p
+          data-empty-state
+          hidden={group.entries.length > 0}
+          class="text-muted-foreground border-border rounded-xl border border-dashed px-4 py-12 text-center text-sm"
+        >
+          아직 이 태그에 등록된 글이 없습니다.
+        </p>
+      </section>
+    ))
+  }
 </section>
 
 <script>
-  function initializeTopicFilter() {
-    const board = document.querySelector<HTMLElement>("[data-topic-board]");
-    if (!board || board.dataset.filterReady === "true") return;
+  let controller: AbortController | undefined;
 
-    const buttons = Array.from(
-      board.querySelectorAll<HTMLButtonElement>("[data-topic-filter]")
+  function initializeTopicFilter() {
+    controller?.abort();
+    const board = document.querySelector<HTMLElement>("[data-topic-board]");
+    if (!board) return;
+
+    controller = new AbortController();
+    const { signal } = controller;
+    const tabs = Array.from(
+      board.querySelectorAll<HTMLButtonElement>("[data-topic-tab]")
     );
-    const sections = Array.from(
-      board.querySelectorAll<HTMLElement>("[data-topic-section]")
+    const panels = Array.from(
+      board.querySelectorAll<HTMLElement>("[data-topic-panel]")
     );
     const status = board.querySelector<HTMLElement>("[data-filter-status]");
 
-    for (const button of buttons) {
-      button.addEventListener("click", () => {
-        const selectedTopic = button.dataset.topicFilter ?? "all";
-        const selectedName = button.dataset.topicName ?? "전체";
+    function select(topic: string, tag: string, updateUrl = true) {
+      const panel =
+        panels.find(panel => panel.dataset.topicPanel === topic) ?? panels[0];
+      if (!panel) return;
 
-        for (const section of sections) {
-          const shouldShow =
-            selectedTopic === "all" || section.dataset.topic === selectedTopic;
+      const selectedTopic = panel.dataset.topicPanel!;
+      const filters = Array.from(
+        panel.querySelectorAll<HTMLButtonElement>("[data-tag-filter]")
+      );
+      const selectedFilter =
+        filters.find(filter => filter.dataset.tagFilter === tag) ?? filters[0];
+      const selectedTag = selectedFilter.dataset.tagFilter!;
 
-          section.hidden = !shouldShow;
-        }
-
-        for (const filterButton of buttons) {
-          filterButton.setAttribute(
-            "aria-pressed",
-            String(filterButton === button)
-          );
-        }
-
-        if (status) {
-          const visibleCount = sections
-            .filter(section => !section.hidden)
-            .reduce(
-              (count, section) =>
-                count + section.querySelectorAll("[data-post-card]").length,
-              0
-            );
-          status.textContent = `${selectedName} 글 ${visibleCount}개`;
-        }
+      panels.forEach(item => (item.hidden = item !== panel));
+      tabs.forEach(tab => {
+        const selected = tab.dataset.topicTab === selectedTopic;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
       });
+      filters.forEach(filter =>
+        filter.setAttribute("aria-pressed", String(filter === selectedFilter))
+      );
+
+      let count = 0;
+      panel.querySelectorAll<HTMLElement>("[data-post-card]").forEach(card => {
+        card.hidden =
+          selectedTag !== "all" && card.dataset.postTag !== selectedTag;
+        if (!card.hidden) count++;
+      });
+      const emptyState = panel.querySelector<HTMLElement>("[data-empty-state]");
+      if (emptyState) emptyState.hidden = count > 0;
+      if (status) {
+        status.textContent = `${panel.dataset.topicName} ${selectedFilter.dataset.tagName} 글 ${count}개`;
+      }
+
+      const url = new URL(window.location.href);
+      if (updateUrl) {
+        url.searchParams.set("tab", selectedTopic);
+        if (selectedTag === "all") url.searchParams.delete("tag");
+        else url.searchParams.set("tag", selectedTag);
+        window.history.replaceState(window.history.state, "", url);
+      }
+      try {
+        sessionStorage.setItem("backUrl", url.pathname + url.search + url.hash);
+      } catch {
+        // Filtering still works when browser storage is unavailable.
+      }
     }
 
-    board.dataset.filterReady = "true";
+    function restoreSelection() {
+      const params = new URL(window.location.href).searchParams;
+      select(
+        params.get("tab") ?? panels[0]?.dataset.topicPanel ?? "development",
+        params.get("tag") ?? "all",
+        false
+      );
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener(
+        "click",
+        () => select(tab.dataset.topicTab!, "all"),
+        { signal }
+      );
+      tab.addEventListener(
+        "keydown",
+        event => {
+          let next = index;
+          if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+          else if (event.key === "ArrowLeft")
+            next = (index - 1 + tabs.length) % tabs.length;
+          else if (event.key === "Home") next = 0;
+          else if (event.key === "End") next = tabs.length - 1;
+          else return;
+          event.preventDefault();
+          tabs[next].focus();
+          select(tabs[next].dataset.topicTab!, "all");
+        },
+        { signal }
+      );
+    });
+    panels.forEach(panel => {
+      panel
+        .querySelectorAll<HTMLButtonElement>("[data-tag-filter]")
+        .forEach(filter => {
+          filter.addEventListener(
+            "click",
+            () => select(panel.dataset.topicPanel!, filter.dataset.tagFilter!),
+            { signal }
+          );
+        });
+    });
+    window.addEventListener("popstate", restoreSelection, { signal });
+    restoreSelection();
   }
 
   document.addEventListener("astro:page-load", initializeTopicFilter);
+  document.addEventListener("astro:before-swap", () => controller?.abort());
 </script>
 
 <style>
-  [data-topic-filter][aria-pressed="true"] {
+  [data-topic-tab][aria-selected="true"] {
+    border-color: var(--foreground);
+    color: var(--foreground);
+  }
+
+  [data-tag-filter][aria-pressed="true"] {
     border-color: var(--foreground);
     background: var(--foreground);
     color: var(--background);
-  }
-
-  [data-topic-filter][aria-pressed="true"] [data-filter-count] {
-    color: inherit;
-    opacity: 0.7;
   }
 </style>
