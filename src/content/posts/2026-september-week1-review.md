@@ -31,7 +31,7 @@ tags:
 
 ### MVP 시연 영상
 
-개인 홈 서버에서 만들고 있는 MVP 플랫폼의 현재 화면과 동작을 녹화했다. GitHub 로그인과 프로젝트 상세 화면, 배포 이벤트를 확인하는 약 1분 50초 분량의 시연이다.
+GitHub 로그인과 프로젝트 상세 화면, 배포 이벤트를 확인할 수 있다.
 
 <video controls playsinline preload="metadata" aria-label="개인 홈 서버의 GitHub 기반 MVP 플랫폼 시연 영상">
   <source src="/media/hello-mvp-sandbox/mvp-demo.mp4" type="video/mp4" />
