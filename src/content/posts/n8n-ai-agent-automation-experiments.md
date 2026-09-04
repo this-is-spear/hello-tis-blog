@@ -4,6 +4,7 @@ description: 우아콘에서 얻은 AI 에이전트 아이디어를 파일 병�
 pubDatetime: 2025-12-30T13:26:48Z
 tags:
   - AI
+aiCategory: ax
 ---
 
 ## 개요
