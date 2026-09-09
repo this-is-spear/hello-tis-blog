@@ -9,6 +9,7 @@ const TOPIC_TAGS = [
   "Operations",
   "Platform",
   "Product",
+  "Scratchpad",
   "AI",
   "Study",
   "Weekly Review",
