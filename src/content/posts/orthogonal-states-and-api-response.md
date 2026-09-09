@@ -3,7 +3,7 @@ title: "2026년 9월 7일: 어떤 화면을 보여 줄지는 서버에서 정하
 description: 자동 출석권 정책을 바꾸면서 함께 성립하는 상태가 늘었습니다. Harel statechart로 상태 조합을 살펴보고, 서버에서 화면을 선택하도록 바꾼 과정을 적었습니다.
 pubDatetime: 2026-09-07T00:00:00Z
 tags:
-  - Product
+  - Scratchpad
 ---
 
 ## 상황
