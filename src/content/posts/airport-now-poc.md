@@ -12,7 +12,7 @@ tags:
 
 ![알툴즈 홈페이지에 표시된 여행자보험 이벤트 팝업](@/assets/images/airport-now-poc/altools-travel-insurance-event.png)
 
-이 생각을 바탕으로 인천국제공항공사 공공데이터를 연결해 ‘공항 지금’을 만들었습니다. 웹에 직접 배포했고, 현재 [공항 지금](https://airport-now-icn.this-is-spear.chatgpt.site/?terminal=T1&date=2026-09-10&journey=departure)에서 PoC를 진행하고 있습니다.
+이 생각을 바탕으로 인천국제공항공사 공공데이터를 연결해 ‘공항 지금’을 만들었습니다. 웹에 직접 배포해 개인 접근 환경에서 PoC를 진행하고 있습니다.
 
 ## 문제
 
@@ -130,7 +130,7 @@ _2026년 9월 10일 배포 화면. 수집 지연으로 마지막 저장 정보�
 
 </div>
 
-_2026년 9월 10일 캡처. [항공편 링크](https://airport-now-icn.this-is-spear.chatgpt.site/flights/2026-09-10/departure/OM308?terminal=T1)를 열면 같은 항공편과 T1 주차 현황이 함께 표시됩니다._
+_2026년 9월 10일 캡처. 항공편 링크를 열면 같은 항공편과 T1 주차 현황이 함께 표시됩니다._
 
 편명만 전달하면 받는 사람이 날짜와 출도착을 맞춰 다시 검색해야 합니다. 공유 경로에는 이 조건이 담겨 있으며, 브라우저에 남은 이전 선택보다 우선합니다.
 
