@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920" role="img"><title>시간 칸과 출석권 수량 칸으로 비교하는 획득 경계</title><g font-family="Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif"><rect x="0" y="0" width="1200" height="920" rx="0" fill="#fcfcf9"/>
+<text x="30" y="32" font-size="18" fill="#526579" font-weight="600" text-anchor="start">보유 출석권 1장</text>
+<text x="30" y="147" font-size="22" fill="#172d43" font-weight="700" text-anchor="start">경과 시간</text>
+<rect x="180" y="102" width="178" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="269" y="140" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">0시간</text>
+<rect x="375" y="102" width="178" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="464" y="140" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">1시간</text>
+<rect x="570" y="102" width="178" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="659" y="140" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">2시간</text>
+<rect x="765" y="102" width="178" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="854" y="140" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">3시간</text>
+<rect x="960" y="102" width="178" height="76" rx="8" fill="#e4f3f1"/>
+<text dominant-baseline="central" x="1049" y="140" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">4시간</text>
+<line x1="951" y1="84" x2="951" y2="193" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6"/>
+<text x="951" y="66" font-size="19" fill="#b4433b" font-weight="700" text-anchor="middle">4시간</text>
+<line x1="30" y1="222" x2="1170" y2="222" stroke="#c9d3dc" stroke-width="2"/>
+<text x="30" y="259" font-size="20" fill="#526579" font-weight="600" text-anchor="start">획득 클릭</text>
+<rect x="180" y="264" width="360" height="176" rx="8" fill="#ffffff"/>
+<rect x="710" y="264" width="360" height="176" rx="8" fill="#ffffff"/>
+<text x="360" y="303" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">3:59:59</text>
+<text x="360" y="368" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">획득 불가</text>
+<text x="890" y="303" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">4:00:00</text>
+<text x="890" y="368" font-size="22" fill="#087e82" font-weight="700" text-anchor="middle">1장 획득</text>
+<text x="625" y="307" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">4시간</text>
+<line x1="565" y1="339" x2="685" y2="339" stroke="#b4433b" stroke-width="2"/>
+<text x="625" y="379" font-size="19" fill="#526579" font-weight="500" text-anchor="middle">불가 → 가능</text>
+<text x="30" y="485" font-size="18" fill="#526579" font-weight="600" text-anchor="start">출석 후 4시간</text>
+<text x="30" y="601" font-size="22" fill="#172d43" font-weight="700" text-anchor="start">보유량</text>
+<rect x="245" y="556" width="280" height="76" rx="8" fill="#e4f3f1"/>
+<text dominant-baseline="central" x="385" y="594" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">0장</text>
+<rect x="545" y="556" width="280" height="76" rx="8" fill="#e4f3f1"/>
+<text dominant-baseline="central" x="685" y="594" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">1장</text>
+<rect x="845" y="556" width="280" height="76" rx="8" fill="#fcece8"/>
+<text dominant-baseline="central" x="985" y="594" font-size="24" fill="#b4433b" font-weight="700" text-anchor="middle">2장</text>
+<line x1="835" y1="538" x2="835" y2="647" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6"/>
+<text x="835" y="520" font-size="19" fill="#b4433b" font-weight="700" text-anchor="middle">상한 2장</text>
+<line x1="30" y1="676" x2="1170" y2="676" stroke="#c9d3dc" stroke-width="2"/>
+<text x="30" y="713" font-size="20" fill="#526579" font-weight="600" text-anchor="start">획득 클릭</text>
+<rect x="180" y="718" width="360" height="176" rx="8" fill="#ffffff"/>
+<rect x="710" y="718" width="360" height="176" rx="8" fill="#ffffff"/>
+<text x="360" y="757" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">1장</text>
+<text x="360" y="822" font-size="22" fill="#087e82" font-weight="700" text-anchor="middle">1장 획득</text>
+<text x="890" y="757" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">2장</text>
+<text x="890" y="822" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">추가 획득 불가</text>
+<text x="625" y="761" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">2장</text>
+<line x1="565" y1="793" x2="685" y2="793" stroke="#b4433b" stroke-width="2"/>
+<text x="625" y="833" font-size="19" fill="#526579" font-weight="500" text-anchor="middle">가능 → 불가</text></g></svg>
