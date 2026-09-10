@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="605" viewBox="0 0 1200 605" role="img"><title>날짜와 출석 칸을 맞춰 비교하는 완주 경계</title><g font-family="Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif"><rect x="0" y="0" width="1200" height="605" rx="0" fill="#fcfcf9"/>
+<text x="30" y="166" font-size="22" fill="#172d43" font-weight="700" text-anchor="start">날짜</text>
+<rect x="180" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="241" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">17일</text>
+<rect x="315" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="376" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">18일</text>
+<rect x="450" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="511" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">19일</text>
+<rect x="585" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="646" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">20일</text>
+<rect x="720" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="781" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">21일</text>
+<rect x="855" y="121" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="916" y="159" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">22일</text>
+<rect x="990" y="121" width="122" height="76" rx="8" fill="#e4f3f1"/>
+<text dominant-baseline="central" x="1051" y="159" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">23일</text>
+<text x="30" y="281" font-size="22" fill="#172d43" font-weight="700" text-anchor="start">출석</text>
+<rect x="180" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="241" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">1일</text>
+<rect x="315" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="376" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">2일</text>
+<rect x="450" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="511" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">3일</text>
+<rect x="585" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="646" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">4일</text>
+<rect x="720" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="781" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">5일</text>
+<rect x="855" y="236" width="122" height="76" rx="8" fill="#eef1f4"/>
+<text dominant-baseline="central" x="916" y="274" font-size="24" fill="#172d43" font-weight="700" text-anchor="middle">6일</text>
+<rect x="990" y="236" width="122" height="76" rx="8" fill="#e4f3f1"/>
+<text dominant-baseline="central" x="1051" y="274" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">7일</text>
+<line x1="983" y1="103" x2="983" y2="327" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6"/>
+<text x="983" y="85" font-size="19" fill="#b4433b" font-weight="700" text-anchor="middle">7일 완주</text>
+<line x1="30" y1="351" x2="1170" y2="351" stroke="#c9d3dc" stroke-width="2"/>
+<text x="30" y="388" font-size="20" fill="#526579" font-weight="600" text-anchor="start">수령 요청</text>
+<rect x="180" y="393" width="360" height="176" rx="8" fill="#ffffff"/>
+<rect x="710" y="393" width="360" height="176" rx="8" fill="#ffffff"/>
+<text x="360" y="432" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">6일</text>
+<text x="360" y="461" font-size="18" fill="#526579" font-weight="400" text-anchor="middle">22일까지 출석 완료</text>
+<text x="360" y="497" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">수령 불가</text>
+<text x="890" y="432" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">7일</text>
+<text x="890" y="461" font-size="18" fill="#526579" font-weight="400" text-anchor="middle">23일까지 출석 완료</text>
+<text x="890" y="497" font-size="22" fill="#087e82" font-weight="700" text-anchor="middle">수령 가능</text>
+<text x="625" y="436" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">7일</text>
+<line x1="565" y1="468" x2="685" y2="468" stroke="#b4433b" stroke-width="2"/>
+<text x="625" y="508" font-size="19" fill="#526579" font-weight="500" text-anchor="middle">미완주 → 완주</text></g></svg>
