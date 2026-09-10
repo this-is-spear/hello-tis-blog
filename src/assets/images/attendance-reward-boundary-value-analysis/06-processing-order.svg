@@ -1,77 +1,77 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="625" viewBox="0 0 1200 625" role="img"><title>만료일 다음날 유예 중 채운 마지막 출석</title><g font-family="Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif"><rect x="0" y="0" width="1200" height="625" rx="0" fill="#fcfcf9"/>
-<text x="30" y="32" font-size="18" fill="#526579" font-weight="600" text-anchor="start">현재 동작</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="625" viewBox="0 0 1200 625" role="img"><title>만료일 다음날 유예 중 채운 마지막 출석</title><g font-family="Apple SD Gothic Neo, Noto Sans CJK KR, sans-serif"><rect x="0" y="0" width="1200" height="625" rx="0" fill="#fcfcf9" />
+<text x="30" y="32" font-size="18" fill="#526579" font-weight="600" text-anchor="start">수정 후</text>
 <text x="30" y="164" font-size="23" fill="#172d43" font-weight="700" text-anchor="start">광고 제거</text>
 <text x="30" y="273" font-size="23" fill="#172d43" font-weight="700" text-anchor="start">출석</text>
-<rect x="155" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="155" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="192.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">23일</text>
 <text x="192.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">수령</text>
-<rect x="155" y="236" width="75" height="66" rx="8" fill="#eef1f4"/>
+<rect x="155" y="236" width="75" height="66" rx="8" fill="#eef1f4" />
 <text dominant-baseline="central" x="192.5" y="269" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">—</text>
-<rect x="239" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="239" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="276.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">24일</text>
 <text x="276.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="239" y="236" width="75" height="66" rx="8" fill="#fcece8"/>
+<rect x="239" y="236" width="75" height="66" rx="8" fill="#fcece8" />
 <text dominant-baseline="central" x="276.5" y="269" font-size="24" fill="#b4433b" font-weight="700" text-anchor="middle">결석</text>
-<rect x="323" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="323" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="360.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">25일</text>
 <text x="360.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="323" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="323" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="360.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">1일</text>
-<rect x="407" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="407" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="444.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">26일</text>
 <text x="444.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="407" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="407" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="444.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">2일</text>
-<rect x="491" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="491" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="528.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">27일</text>
 <text x="528.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="491" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="491" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="528.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">3일</text>
-<rect x="575" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="575" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="612.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">28일</text>
 <text x="612.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="575" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="575" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="612.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">4일</text>
-<rect x="659" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="659" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="696.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">29일</text>
 <text x="696.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="659" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="659" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="696.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">5일</text>
-<rect x="743" y="121" width="75" height="76" rx="8" fill="#e4f3f1"/>
+<rect x="743" y="121" width="75" height="76" rx="8" fill="#e4f3f1" />
 <text x="780.5" y="153" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">30일</text>
 <text x="780.5" y="182" font-size="18" fill="#087e82" font-weight="400" text-anchor="middle">적용</text>
-<rect x="743" y="236" width="75" height="66" rx="8" fill="#e4f3f1"/>
+<rect x="743" y="236" width="75" height="66" rx="8" fill="#e4f3f1" />
 <text dominant-baseline="central" x="780.5" y="269" font-size="24" fill="#087e82" font-weight="700" text-anchor="middle">6일</text>
-<line x1="155" y1="88" x2="818" y2="88" stroke="#087e82" stroke-width="2"/>
+<line x1="155" y1="88" x2="818" y2="88" stroke="#087e82" stroke-width="2" />
 <text x="486" y="75" font-size="21" fill="#087e82" font-weight="700" text-anchor="middle">8일</text>
-<line x1="838" y1="103" x2="838" y2="323" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6"/>
+<line x1="838" y1="103" x2="838" y2="323" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6" />
 <text x="838" y="85" font-size="19" fill="#b4433b" font-weight="700" text-anchor="middle">31일 00:00</text>
-<line x1="1075" y1="103" x2="1075" y2="323" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6"/>
+<line x1="1075" y1="103" x2="1075" y2="323" stroke="#b4433b" stroke-width="2" stroke-dasharray="5 6" />
 <text x="1075" y="85" font-size="19" fill="#b4433b" font-weight="700" text-anchor="middle">00:30</text>
-<rect x="854" y="121" width="205" height="76" rx="8" fill="#fff2dc"/>
+<rect x="854" y="121" width="205" height="76" rx="8" fill="#fff2dc" />
 <text x="956.5" y="153" font-size="24" fill="#9b5b0c" font-weight="700" text-anchor="middle">유예 30분</text>
 <text x="956.5" y="182" font-size="18" fill="#9b5b0c" font-weight="400" text-anchor="middle">광고 숨김</text>
-<rect x="1090" y="121" width="85" height="76" rx="8" fill="#fcece8"/>
+<rect x="1090" y="121" width="85" height="76" rx="8" fill="#fcece8" />
 <text x="1132.5" y="153" font-size="24" fill="#b4433b" font-weight="700" text-anchor="middle">광고</text>
 <text x="1132.5" y="182" font-size="18" fill="#b4433b" font-weight="400" text-anchor="middle">표시</text>
-<rect x="854" y="236" width="205" height="76" rx="8" fill="#fff2dc"/>
+<rect x="854" y="236" width="205" height="76" rx="8" fill="#fff2dc" />
 <text x="956.5" y="268" font-size="24" fill="#9b5b0c" font-weight="700" text-anchor="middle">7일</text>
 <text x="956.5" y="297" font-size="18" fill="#9b5b0c" font-weight="400" text-anchor="middle">00:10 출석</text>
-<rect x="1090" y="236" width="85" height="76" rx="8" fill="#eef1f4"/>
+<rect x="1090" y="236" width="85" height="76" rx="8" fill="#eef1f4" />
 <text x="1132.5" y="268" font-size="24" fill="#526579" font-weight="700" text-anchor="middle">수령</text>
 <text x="1132.5" y="297" font-size="18" fill="#526579" font-weight="400" text-anchor="middle">대기</text>
-<line x1="30" y1="365" x2="1170" y2="365" stroke="#c9d3dc" stroke-width="2"/>
+<line x1="30" y1="365" x2="1170" y2="365" stroke="#c9d3dc" stroke-width="2" />
 <text x="30" y="402" font-size="20" fill="#526579" font-weight="600" text-anchor="start">31일 출석</text>
-<rect x="180" y="407" width="360" height="176" rx="8" fill="#ffffff"/>
-<rect x="710" y="407" width="360" height="176" rx="8" fill="#ffffff"/>
+<rect x="180" y="407" width="360" height="176" rx="8" fill="#ffffff" />
+<rect x="710" y="407" width="360" height="176" rx="8" fill="#ffffff" />
 <text x="360" y="446" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">00:09:59</text>
 <text x="360" y="475" font-size="18" fill="#526579" font-weight="400" text-anchor="middle">7일차 클릭 전</text>
 <text x="360" y="511" font-size="22" fill="#526579" font-weight="700" text-anchor="middle">출석 6일</text>
 <text x="360" y="539" font-size="22" fill="#526579" font-weight="500" text-anchor="middle">실제 연장 없음</text>
 <text x="890" y="446" font-size="30" fill="#172d43" font-weight="700" text-anchor="middle">00:10:00</text>
 <text x="890" y="475" font-size="18" fill="#526579" font-weight="400" text-anchor="middle">7일차 클릭 후</text>
-<text x="890" y="511" font-size="22" fill="#9b5b0c" font-weight="700" text-anchor="middle">출석 7일 · 연장 완료 안내</text>
+<text x="890" y="511" font-size="22" fill="#9b5b0c" font-weight="700" text-anchor="middle">출석 7일 · 수령 안내</text>
 <text x="890" y="539" font-size="22" fill="#526579" font-weight="500" text-anchor="middle">실제 연장 없음</text>
 <text x="625" y="450" font-size="22" fill="#b4433b" font-weight="700" text-anchor="middle">00:10</text>
-<line x1="565" y1="482" x2="685" y2="482" stroke="#b4433b" stroke-width="2"/>
-<text x="625" y="522" font-size="19" fill="#526579" font-weight="500" text-anchor="middle">안내만 변경</text></g></svg>
+<line x1="565" y1="482" x2="685" y2="482" stroke="#b4433b" stroke-width="2" />
+<text x="625" y="522" font-size="19" fill="#526579" font-weight="500" text-anchor="middle">수령 대기</text></g></svg>
