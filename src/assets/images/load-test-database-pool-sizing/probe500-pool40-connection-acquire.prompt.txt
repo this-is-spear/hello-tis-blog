@@ -1,7 +1,0 @@
-Create a single wide Korean technical time-series chart by redrawing ONLY the TOP-LEFT acquisition p99 panel of the supplied screenshot. White background, sharp readable dark text, thin light gray grid. Approximately1536x640, one plotting area.
-Title "2차 커넥션 획득 시간 p99". Blue solid line legend "Master"; orange dashed line legend "Replica". Do not copy the internal service name or qa namespace.
-Common y-axis ms, 0 to800, ticks0ms,200ms,400ms,600ms,800ms. Shared time axis preserving source tick locations16:07,16:08,16:09,16:10,16:11. Data begin slightly before16:07 and end about16:11:30. Do not invent a highlighted test interval.
-Master curve: starts~120ms, near150ms around16:07, steep rise to691ms just after16:07, plateau~680ms to16:08, then decline to~610ms around16:08:15, mostly600-615ms through16:11, falls to409ms around16:11:15 and ends409ms.
-Replica curve: starts~170ms, rises to~325ms shortly before16:07, near350ms after16:07, peak383ms around16:08, then~360ms and steady~350-355ms untilend. Closely match original screenshot's approximate curve shape and horizontal peak positions. Label Master peak "최대 691ms"; Replica peak "최대 383ms". Labels must not overlap curves or axis labels.
-Footer "원본 화면 기반 근사 그래프 · p99 최댓값은 표시 구간 기준".
-No other panels, no resource cards, no paragraphs, no success/bottleneck conclusions. Do not include usage, creation, throughput, old values1.25s/1.36s, source screenshots or icons. Keep large plot and balanced white margins.
