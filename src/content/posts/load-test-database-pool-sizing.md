@@ -104,10 +104,24 @@ tags:
 
 ### Redis
 
+#### 1차 리소스
+
 ![Redis 엔진 CPU·메모리 사용률과 부하 구간(약 13:51 ~ 13:54). 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
 
 - 엔진 CPU 사용률: 최대 약 0.87%
 - 메모리 사용률: 최대 약 3.88%
+
+#### 5차 트레이스
+
+![17:10:00.266의 today 트레이스. 전체 310.68ms, Redis set 8.11ms, connection 302.21ms](@/assets/images/load-test-database-pool-sizing/today-trace-171000.png)
+
+- 전체: 310.68ms
+- Redis `set`: 999.58ms(16:05:21) → 8.11ms(17:10:00)
+- `connection` span: 302.21ms
+
+단일 요청 비교입니다. **가설은 CPU 증설에 따른 Lettuce 이벤트 루프의 실행 대기 감소입니다.**
+
+[Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)합니다. CPU 1 → 2 vCPU가 이벤트 루프 스레드 증가를 뜻하지는 않습니다.
 
 ### DB
 
@@ -251,5 +265,6 @@ DB별 커넥션 상한에는 배포 중 태스크와 다른 클라이언트도 �
 - 미시작 iteration: 발생 시각·VU 사용량
 - 태스크별: CPU 사용률·요청 수·트래픽 분배
 - CPU: 부하 구간의 CPU 프로파일·GC 시간
+- Lettuce: CPU throttling·이벤트 루프 지연·스레드 설정·Redis 명령 지연
 - Tomcat: 사용 중 스레드 수·스레드 상한·커넥션 수
 - DB 풀: 태스크별 풀 크기·획득 타임아웃·전체 커넥션 상한
