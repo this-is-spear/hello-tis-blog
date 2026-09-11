@@ -1,6 +1,6 @@
 ---
-title: "[26.09.11] 부하테스트로 DB 커넥션 풀 크기 산정하기"
-description: 풀 크기 10에서 API p99가 20초를 넘어 서버·Redis·DB 지표를 분석하고 튜닝 기준을 정했습니다.
+title: "[26.09.11] 부하테스트로 DB 풀과 서버 CPU 조정하기"
+description: DB 풀 조정과 태스크 증설에도 남은 지연을 CPU 증설 후 다시 측정했습니다.
 pubDatetime: 2026-09-11T00:00:00Z
 tags:
   - Scratchpad
@@ -13,7 +13,7 @@ tags:
 - 기본 흐름: 토큰 발급 → 출석 상태 조회(`today`)
 - 추가 요청: 사용자 중 7%는 출석 확정, 2%는 현황판 조회
 
-이 흐름을 k6의 iteration 하나로 구성했습니다. 목표 부하는 2,000 iteration/s였지만, 1차 테스트의 500 iteration/s에서 API p99가 3초를 초과했습니다.
+이 흐름을 k6의 iteration 하나로 구성했습니다. 목표는 2,000 iteration/s였지만, 초기 500 iteration/s에서 응답 시간이 기준을 초과했습니다.
 
 ## 문제
 
@@ -22,56 +22,103 @@ tags:
 - HTTP 5xx 응답
 - 응답 시간 3초 이상
 
-이에 따라 모든 API의 p99 기준을 **3초 미만**으로 정했습니다.
+모든 API의 p99 기준은 **3초 미만**으로 정했습니다.
 
 ### ASIS
 
-**1차 부하테스트: 풀 크기 10 · 500 iteration/s · 3분**
+**태스크 2개 · 태스크당 1 vCPU·4GB · DB 풀 크기 10**
 
-![1차 부하테스트의 HTTP 응답 시간 추이와 약 13:51 ~ 13:54의 부하 구간](@/assets/images/load-test-database-pool-sizing/probe500-pool10-response-time.png)
+![초기 HTTP 응답 시간 추이. 약 13:51 ~ 13:54의 부하 구간](@/assets/images/load-test-database-pool-sizing/probe500-pool10-response-time.png)
 
-- 부하 구간: 약 13:51 ~ 13:54
+- 부하: 500 iteration/s · 3분
 - 그래프: 전체 요청의 max·p95·p90·min
 - 표: API별 p99
 
-| API                     | 풀 크기 10 p99 |
-| ----------------------- | -------------: |
-| 토큰 발급               |         20.78s |
-| 출석 상태 조회(`today`) |         21.00s |
-| 출석 확정               |         21.28s |
-| 현황판 조회(`board`)    |         20.86s |
+| API                     | 초기 p99 |
+| ----------------------- | -------: |
+| 토큰 발급               |   20.78s |
+| 출석 상태 조회(`today`) |   21.00s |
+| 출석 확정               |   21.28s |
+| 현황판 조회(`board`)    |   20.86s |
 
 ## 원인
 
-다음 인프라의 지표를 분석해 튜닝 항목을 정했습니다.
+초기 상태를 서버·Redis·DB로 나눠 분석했습니다.
 
-- 서버
-- Redis
-- DB
+### 서버 · CPU 100%
 
-### 서버
+![초기 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
 
-#### 배포 구간 리소스
+- CPU 사용률: 최대 약 100%
+- 메모리 사용률: 최대 약 30.5%
 
-- CPU 사용률: 표시 구간 최대 약 101.91%
-- 메모리 사용률: 표시 구간 최대 약 23.93%
-- 배포 시작·종료 구간이 포함된 집계이며, 5차 부하 구간(17:08 ~ 17:11) 전체는 포함하지 않습니다.
+### Redis · 낮은 사용률에도 요청 지연
 
-#### 추가 측정
+![Redis 엔진 CPU·메모리 사용률과 부하 구간. 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
 
-![서버 CPU·메모리 추가 측정. 15:50 ~ 16:20 구간의 근사 그래프](@/assets/images/load-test-database-pool-sizing/ecs-scale-out-server-resources.png)
+- 엔진 CPU 사용률: 최대 약 0.87%
+- 메모리 사용률: 최대 약 3.88%
 
-- CPU 사용률: 표시 구간 최대 약 100%
-- 메모리 사용률: 표시 구간 최대 약 24.24%
+**출석 상태 조회(`today`)**
 
-#### 2차
+![초기 today 트레이스. 전체 1.09s, Redis set 205.29ms, connection 486.69ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-today-trace.png)
 
-![2차 서버 CPU·메모리 사용률. 최대 CPU 약 98.9%, 메모리 약 24.24%](@/assets/images/load-test-database-pool-sizing/probe500-pool40-server-resources.png)
+- 전체: 1.09초
+- Redis `set`: 205.29ms
+- `connection` span: 486.69ms
+
+**현황판 조회(`board`)**
+
+![초기 board 트레이스. 전체 698.75ms, Redis set 384.48ms, connection 289.62ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-board-trace.png)
+
+- 전체: 698.75ms
+- Redis `set`: 384.48ms
+- `connection` span: 289.62ms
+
+### DB · 커넥션 획득 지연
+
+[HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 시작했습니다.
+
+- 최대 풀 크기: Master·Replica 각각 10개
+- 커넥션 획득 타임아웃: 30초
+
+![초기 커넥션 획득 시간 p99](@/assets/images/load-test-database-pool-sizing/connection-acquire.png)
+
+- HikariPool-1 획득 p99: 표시 구간 최대 1.25초
+- HikariPool-2 획득 p99: 표시 구간 최대 1.36초
+
+`connection` span에는 SELECT 실행 시간도 포함됩니다. 획득 시간은 HikariCP의 acquire 지표로 확인했습니다.
+
+DB CPU 사전 측정값은 다음과 같았습니다. 측정일·인스턴스 클래스는 미확인이므로 풀 조정에는 획득 시간을 사용했습니다.
+
+| 대상    | 주요 요청                | 평시 CPU | 피크 CPU |
+| ------- | ------------------------ | -------: | -------: |
+| Replica | `today` 약 200 RPS       |  약 4.0% |  약 7.8% |
+| Master  | 출석 확정 약 10 ~ 15 RPS |  약 4.0% | 약 5.87% |
+
+## 해결
+
+모든 비교는 **500 iteration/s·3분**, VU 초기 1,000개·최대 5,000개로 진행했습니다. 완료 건수는 종료 대기를 포함한 합계입니다.
+
+### 1차 개선 · DB 풀 조정
+
+커넥션 획득 대기를 줄이기 위해 풀을 조정했습니다. 태스크는 1 vCPU·4GB, 2개를 유지했습니다.
+
+- 테스트 태그: `probe500-pool40`
+- Master·Replica별 실제 풀 크기·획득 타임아웃: 적용값 확인 후 기록
+
+![DB 풀 조정 후 커넥션 획득 시간 p99](@/assets/images/load-test-database-pool-sizing/probe500-pool40-connection-acquire.png)
+
+- Master: 획득 p99 최대 691ms · 점유 p99 최대 1.26초
+- Replica: 획득 p99 최대 383ms · 점유 p99 최대 504ms
+- 최댓값: 화면 표시 구간 기준
+
+**API p99는 여전히 3초를 초과했습니다.** 서버와 Redis 호출의 지연을 이어서 확인했습니다.
+
+![DB 풀 조정 후 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/probe500-pool40-server-resources.png)
 
 - CPU 사용률: 최대 약 98.9%
 - 메모리 사용률: 최대 약 24.24%
-
-#### 추가 트레이스 · 16:05:21
 
 ![16:05:21.684의 today 트레이스](@/assets/images/load-test-database-pool-sizing/today-trace-160521.png)
 
@@ -80,131 +127,46 @@ tags:
 - `connection` span: 574.43ms
 - SELECT: 101.66ms · 96.08ms · 122.79ms
 
-#### 1차
+### 2차 개선 · 태스크 증설
 
-![1차 부하테스트의 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
+CPU 부하를 분산하기 위해 **태스크를 2 → 4개**로 늘렸습니다. 태스크당 1 vCPU·4GB와 테스트 태그는 유지했습니다.
 
-- CPU 사용률: 약 100%까지 상승
-- 메모리 사용률: 최대 약 30.5%
+- 완료 iteration: 66,558 → 76,963건
+- 미시작 iteration: 23,443 → 13,038건
+- API p99: 3초 초과
 
-![1차 부하테스트의 커넥션 획득 시간 p99](@/assets/images/load-test-database-pool-sizing/connection-acquire.png)
+![태스크 증설 전후 서버 CPU·메모리 사용률. 15:50 ~ 16:20의 근사 그래프](@/assets/images/load-test-database-pool-sizing/ecs-scale-out-server-resources.png)
 
-- HikariPool-1 획득 시간 p99: 표시 구간 최대 1.25초
-- HikariPool-2 획득 시간 p99: 표시 구간 최대 1.36초
+- CPU 사용률: 표시 구간 최대 약 100%
+- 메모리 사용률: 표시 구간 최대 약 24.24%
 
-**출석 상태 조회(`today`)**
+처리량은 늘었지만 응답 시간 기준에는 도달하지 못했습니다. 앞선 Redis 지연을 바탕으로 **로직의 CPU·스레드 점유가 Lettuce 이벤트 루프 실행을 지연시킨다는 가설**을 세웠습니다.
 
-![13:53:43.494의 today 트레이스. 전체 1.09s, Redis set 205.29ms, connection 486.69ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-today-trace.png)
+[Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)합니다. 이 단계의 Redis 트레이스와 스레드 프로파일은 추가 확인 항목으로 남겼습니다.
 
-- 전체: 1.09초
-- Redis `set`: 205.29ms
-- `connection` span: 486.69ms
+### 3차 개선 · CPU 증설
 
-**현황판 조회(`board`)**
+태스크당 CPU를 **1 → 2 vCPU**, 태스크를 **4 → 8개**로 늘렸습니다. 메모리는 4GB를 유지했습니다.
 
-![13:53:46.780의 board 트레이스. 전체 698.75ms, Redis set 384.48ms, connection 289.62ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-board-trace.png)
+![CPU 증설·태스크 8개에서의 HTTP 응답 시간 추이](@/assets/images/load-test-database-pool-sizing/probe500-ecs8-response-time.png)
 
-- 전체: 698.75ms
-- Redis `set`: 384.48ms
-- `connection` span: 289.62ms
+- API p99: 모두 3초 미만
+- 최대 응답 시간: 10.74초
+- 미시작 iteration: 38건
 
-### Redis
-
-#### 1차 리소스
-
-![Redis 엔진 CPU·메모리 사용률과 부하 구간(약 13:51 ~ 13:54). 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
-
-- 엔진 CPU 사용률: 최대 약 0.87%
-- 메모리 사용률: 최대 약 3.88%
-
-#### 5차 트레이스
+이후 **2 vCPU·4GB를 유지하고 태스크를 8 → 5개**로 줄여 재측정했습니다. 최종 결과는 TOBE에 정리했습니다.
 
 ![17:10:00.266의 today 트레이스. 전체 310.68ms, Redis set 8.11ms, connection 302.21ms](@/assets/images/load-test-database-pool-sizing/today-trace-171000.png)
 
 - 전체: 310.68ms
-- Redis `set`: 999.58ms(16:05:21) → 8.11ms(17:10:00)
+- Redis `set`: 8.11ms
 - `connection` span: 302.21ms
 
-단일 요청 비교입니다. **가설은 CPU 증설에 따른 Lettuce 이벤트 루프의 실행 대기 감소입니다.**
-
-[Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)합니다. CPU 1 → 2 vCPU가 이벤트 루프 스레드 증가를 뜻하지는 않습니다.
-
-### DB
-
-#### 2차 커넥션
-
-![2차 커넥션 획득 시간 p99. 표시 구간 최대 Master 691ms, Replica 383ms](@/assets/images/load-test-database-pool-sizing/probe500-pool40-connection-acquire.png)
-
-- Master: 획득 p99 최대 691ms · 점유 p99 최대 1.26초
-- Replica: 획득 p99 최대 383ms · 점유 p99 최대 504ms
-
-최댓값은 화면 표시 구간 기준입니다.
-
-#### 1차 설정
-
-1차는 [HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 테스트했습니다.
-
-- 최대 풀 크기: Master·Replica 각각 10개
-- 커넥션 획득 타임아웃: 30초
-
-`connection` span에는 SELECT 실행 시간도 포함됩니다. 획득 시간은 HikariCP의 acquire 지표를 사용했습니다.
-
-#### DB CPU 사용률
-
-사전 측정값입니다.
-
-- 테스트 시간: 16:49 ~ 17:01
-- CPU 사용률 상승 구간: 약 16:45 ~ 17:10
-- 출처: 스테이징 서버 그래프. `약`은 화면에서 읽은 근사값
-- 미확인 정보: 측정일, DB 인스턴스 클래스, 현황판 RPS
-
-| 대상    | 주요 요청                       | 평시 CPU 사용률 | 피크 CPU 사용률 |
-| ------- | ------------------------------- | --------------: | --------------: |
-| Replica | `today` 약 200 RPS, 현황판 조회 |         약 4.0% |         약 7.8% |
-| Master  | 출석 확정 약 10 ~ 15 RPS        |         약 4.0% |        약 5.87% |
-
-RPS는 초당 요청 수입니다. Replica CPU 증가분은 `(7.8 − 4.0) / 200 × 100 = 1.9%p/100 RPS`입니다.
-
-같은 DB·데이터에서 CPU 사용률이 RPS에 비례한다고 가정한 추정값입니다.
-
-- `today` 2,000 RPS: CPU 사용률 약 42%
-- `today` 3,000 RPS: CPU 사용률 약 61%
-
-추정에는 현황판 부하와 테스트 전후 변동도 포함됩니다. 풀 크기 비교에는 CPU 추정값 대신 실측 획득 시간 p99를 사용합니다.
-
-## 해결
-
-### 2차 · 풀 변경
-
-- 테스트 태그: `probe500-pool40`
-- 목표 부하·시간: 500 iteration/s · 3분
-- VU: 초기 1,000개 · 최대 5,000개
-- ECS 태스크: 2개
-
-Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용값을 확인한 뒤 기록합니다.
-
-### 3차 · ECS 증설
-
-- 태스크 수: 2 → 4개
-- 태스크당 사양: 1 vCPU · 메모리 4GB
-- 테스트 태그·목표 부하·시간·VU 설정: 2차와 동일
-
-### 4차 · ECS 태스크·CPU 증설
-
-- 태스크 수: 4 → 8개
-- 태스크당 CPU: 1 → 2 vCPU
-- 태스크당 메모리: 4GB 유지
-- 테스트 태그·목표 부하·시간·VU 설정: 2차와 동일
-
-### 5차 · ECS 태스크 축소
-
-- 태스크 수: 8 → 5개
-- 태스크당 사양: 2 vCPU · 메모리 4GB 유지
-- 테스트 태그·목표 부하·시간·VU 설정: 2차와 동일
+CPU 증설 전보다 Redis 호출 지연도 줄었습니다. 단일 요청 비교이며, CPU·태스크 수·배포 상태가 함께 달라졌으므로 스레드 점유 가설은 별도 검증합니다.
 
 ### 트러블슈팅 · Too many connections
 
-튜닝 중 `Too many connections`가 발생해 `processlist`를 IP별로 집계했습니다. `host`는 `IP:포트`이므로 포트를 제외해야 같은 IP의 커넥션을 합산할 수 있었습니다.
+튜닝 중 `Too many connections`가 발생해 `processlist`를 IP별로 집계했습니다. `host`는 `IP:포트`이므로 포트를 제외해 합산했습니다.
 
 - 전체 커넥션: 161개 중 `Sleep` 160개
 - 10개 IP: 각각 15개, 총 150개 모두 `Sleep`
@@ -214,7 +176,7 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 
 후속 확인·조치입니다.
 
-- IP 대조: 실행 중·종료 중인 ECS 태스크와 커넥션 IP 비교
+- IP 대조: 실행 중·종료 중인 태스크와 커넥션 IP 비교
 - 정리: 종료된 태스크의 잔존 커넥션을 확인한 뒤 [`mysql.rds_kill`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.CommonDBATasks.End.html)로 종료
 - 만료 설정: 세션의 `wait_timeout` 확인
 - 커넥션 상한: DB별 `max_connections`와 배포 중 태스크·풀·다른 클라이언트의 합계 비교
@@ -223,54 +185,38 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 
 ### TOBE
 
-**4차 · ECS 8개**
+**최종 구성: 태스크 5개 · 태스크당 2 vCPU·4GB**
 
-![4차 · ECS 8개 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs8-response-time.png)
+![최종 구성의 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs5-response-time.png)
 
-**5차 · ECS 5개**
+그래프는 전체 요청의 max·p95·p90·min, 표는 API별 p99입니다. 앞선 그래프와 축 범위는 다릅니다.
 
-![5차 · ECS 5개 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs5-response-time.png)
+| API                     | DB 풀 조정 | 태스크 증설 | CPU 증설·8개 | 최종·5개 |
+| ----------------------- | ---------: | ----------: | -----------: | -------: |
+| 토큰 발급               |     28.28s |      18.78s |        1.90s |  20.43ms |
+| 출석 상태 조회(`today`) |     28.54s |      19.26s |        2.19s |   80.8ms |
+| 출석 확정               |     28.41s |      19.43s |        2.57s |   55.9ms |
+| 현황판 조회(`board`)    |     28.29s |      18.96s |        2.08s |  33.53ms |
 
-그래프는 전체 요청의 max·p95·p90·min, 표는 API별 p99입니다. 두 그래프의 시간축·세로축 범위는 다릅니다.
+- 완료 iteration: 90,001건 · 약 500 iteration/s
+- HTTP 실패: 0 / 188,078건
+- 최대 응답 시간: 603.41ms
+- 미시작 iteration: 로그 미표기
 
-| API                     | 2차 · ECS 2개 p99 | 3차 · ECS 4개 p99 | 4차 · ECS 8개 p99 | 5차 · ECS 5개 p99 |
-| ----------------------- | ----------------: | ----------------: | ----------------: | ----------------: |
-| 토큰 발급               |            28.28s |            18.78s |             1.90s |           20.43ms |
-| 출석 상태 조회(`today`) |            28.54s |            19.26s |             2.19s |            80.8ms |
-| 출석 확정               |            28.41s |            19.43s |             2.57s |            55.9ms |
-| 현황판 조회(`board`)    |            28.29s |            18.96s |             2.08s |           33.53ms |
-
-1차 → 2차 → 3차 → 4차 → 5차 비교입니다.
-
-- 완료 iteration: 28,885 → 66,558 → 76,963 → 89,962 → 90,001건
-- 미시작 iteration: 61,116 → 23,443 → 13,038 → 38건 → 로그 미표기
-- HTTP 실패: 436 / 60,374 → 0 / 139,068 → 0 / 160,803 → 0 / 188,029 → 0 / 188,078건
-- HTTP 응답 시간 평균: 15.06초 → 3.56초 → 5.34초 → 217.27ms → 7.02ms
-- HTTP 응답 시간 p50: 15.88초 → 379.87ms → 1.7초 → 5.47ms → 4.38ms
-
-완료 건수는 종료 대기까지 포함한 로그 합계입니다. 2·4차는 3분, 3차는 3분 16.9초에 종료됐습니다.
-
-4차 → 5차 기준 확인입니다.
-
-- API p99: 모두 3초 미만
-- HTTP 최대 응답 시간: 10.74초 → 603.41ms
-- k6의 200ms·300ms 기준: 실패 → 통과
+**500 iteration/s에서는 모든 요청이 3초 미만이었고, k6의 200ms·300ms p99 기준도 통과했습니다.** 목표인 2,000 iteration/s는 다음 측정으로 남았습니다.
 
 ### 튜닝 기준
-
-다음 튜닝은 서버 리소스와 DB 커넥션을 함께 조절합니다.
 
 - 서버 CPU 부족: 태스크당 풀을 줄여 DB 커넥션 여유를 확보하고 스케일 아웃합니다.
 - 서버 CPU 여유·커넥션 획득 대기 발생: DB 처리 여유를 확인하고 풀을 늘려 스케일 아웃을 최소화합니다.
 
 DB별 커넥션 상한에는 배포 중 태스크와 다른 클라이언트도 포함합니다. [풀 크기는 부하테스트로 검증](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)하고, 동일 부하의 API p99·처리량으로 비교합니다.
 
-### 다음 측정
+### 남은 검증
 
-- 재현성: 배포 완료·태스크 수 고정 후 동일 워밍업·DB 풀 조건에서 태스크 5개·8개 재측정
-- 미시작 iteration: 발생 시각·VU 사용량
-- 태스크별: 부하 구간의 CPU 사용률·요청 수·트래픽 분배
-- CPU: 부하 구간의 CPU 프로파일·GC 시간
-- Lettuce: CPU throttling·이벤트 루프 지연·스레드 설정·Redis 명령 지연
-- Tomcat: 사용 중 스레드 수·스레드 상한·커넥션 수
-- DB 풀: 태스크별 풀 크기·획득 타임아웃·전체 커넥션 상한
+- 재현성: 배포 완료·태스크 수 고정 후 동일 워밍업·DB 풀 조건에서 재측정
+- 목표 부하: 2,000 iteration/s
+- 스레드 점유 가설: CPU 프로파일·throttling·GC·Lettuce 이벤트 루프 지연
+- DB 풀: 태스크별 적용값·획득 타임아웃·전체 커넥션 상한
+
+배포 구간 화면에서는 CPU 최대 약 101.91%, 메모리 최대 약 23.93%였습니다. 최종 부하 구간(17:08 ~ 17:11) 전체는 포함하지 않아 태스크별 지표를 다시 수집합니다.
