@@ -51,6 +51,15 @@ tags:
 
 ### 서버
 
+#### 2차
+
+![2차 서버 CPU·메모리 사용률. 최대 CPU 약 98.9%, 메모리 약 24.24%](@/assets/images/load-test-database-pool-sizing/probe500-pool40-server-resources.png)
+
+- CPU 사용률: 최대 약 98.9%
+- 메모리 사용률: 최대 약 24.24%
+
+#### 1차
+
 ![1차 부하테스트의 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
 
 - CPU 사용률: 약 100%까지 상승
@@ -163,5 +172,6 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 
 다음 분석 대상은 서버입니다.
 
-- 서버: 같은 부하 구간의 CPU·Tomcat 사용 중 스레드 수·커넥션 수
+- CPU: 부하 구간의 CPU 프로파일·GC 시간
+- Tomcat: 사용 중 스레드 수·스레드 상한·커넥션 수
 - 설정: Master·Replica별 풀 크기·획득 타임아웃·Tomcat 스레드 상한
