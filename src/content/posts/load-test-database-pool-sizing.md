@@ -203,9 +203,15 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 
 ### TOBE
 
+**4차 · ECS 8개**
+
+![4차 · ECS 8개 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs8-response-time.png)
+
+**5차 · ECS 5개**
+
 ![5차 · ECS 5개 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs5-response-time.png)
 
-5차 응답 시간 추이입니다. 그래프는 전체 요청의 max·p95·p90·min, 표는 API별 p99입니다.
+그래프는 전체 요청의 max·p95·p90·min, 표는 API별 p99입니다. 두 그래프의 시간축·세로축 범위는 다릅니다.
 
 | API                     | 2차 · ECS 2개 p99 | 3차 · ECS 4개 p99 | 4차 · ECS 8개 p99 | 5차 · ECS 5개 p99 |
 | ----------------------- | ----------------: | ----------------: | ----------------: | ----------------: |
