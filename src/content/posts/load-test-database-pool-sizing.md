@@ -24,7 +24,7 @@ tags:
 
 모든 API의 p99 기준은 **3s 이내**로 정했습니다.
 
-**태스크 2개 · 태스크당 1 vCPU·4GB · DB 풀 크기 10**
+초기 부하테스트에서 모든 API의 p99가 3s를 초과했습니다. **요청 처리에 성공해도 응답 지연으로 클라이언트의 서버 장애 기준을 넘는 것**이 문제였습니다.
 
 ![초기 HTTP 응답 시간 추이. 약 13:51 ~ 13:54의 부하 구간](@/assets/images/load-test-database-pool-sizing/probe500-pool10-response-time.png)
 
@@ -54,29 +54,27 @@ tags:
 
 ### 서버 · CPU 사용률 100%
 
-![초기 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
-
-- CPU 사용률: 최대 약 100%
-- 메모리 사용률: 최대 약 30.5%
+| 지표   | 최대 사용률 |
+| ------ | ----------: |
+| CPU    |     약 100% |
+| 메모리 |    약 30.5% |
 
 ### Redis · CPU·메모리 사용률 확인
 
-![Redis 엔진 CPU·메모리 사용률과 부하 구간. 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
-
-- 엔진 CPU 사용률: 최대 약 0.87%
-- 메모리 사용률: 최대 약 3.88%
+| 지표     | 최대 사용률 |
+| -------- | ----------: |
+| 엔진 CPU |    약 0.87% |
+| 메모리   |    약 3.88% |
 
 ### DB · 커넥션 획득 지연
 
 [HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 시작했습니다.
 
-- 최대 풀 크기: Master·Replica 각각 10개
-- 커넥션 획득 타임아웃: 30초
-
-![초기 커넥션 획득 시간 p99](@/assets/images/load-test-database-pool-sizing/connection-acquire-master-replica.png)
-
-- Master 획득 p99: 표시 구간 최대 1.25s
-- Replica 획득 p99: 표시 구간 최대 1.36s
+| 설정·지표                        | Master | Replica |
+| -------------------------------- | -----: | ------: |
+| 최대 풀 크기                     |   10개 |    10개 |
+| 커넥션 획득 타임아웃             |   30초 |    30초 |
+| 커넥션 획득 p99 · 표시 구간 최대 |  1.25s |   1.36s |
 
 `connection` span에는 SELECT 실행 시간도 포함됩니다. 획득 시간은 HikariCP의 acquire 지표로 확인했습니다.
 
