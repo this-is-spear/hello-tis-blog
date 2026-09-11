@@ -176,6 +176,23 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 - 태스크당 메모리: 4GB 유지
 - 테스트 태그·목표 부하·시간·VU 설정: 2차와 동일
 
+### 트러블슈팅 · Too many connections
+
+튜닝 중 `Too many connections`가 발생해 `processlist`를 IP별로 집계했습니다. `host`는 `IP:포트`이므로 포트를 제외해야 같은 IP의 커넥션을 합산할 수 있었습니다.
+
+- 전체 커넥션: 161개 중 `Sleep` 160개
+- 10개 IP: 각각 15개, 총 150개 모두 `Sleep`
+- 해당 IP별 최대 유휴 시간: 198 ~ 273초
+
+[`Sleep`은 유휴 상태](https://dev.mysql.com/doc/refman/8.0/en/sys-processlist.html)입니다. 종료된 태스크의 커넥션인지는 태스크 IP와 대조해야 합니다.
+
+후속 확인·조치입니다.
+
+- IP 대조: 실행 중·종료 중인 ECS 태스크와 커넥션 IP 비교
+- 정리: 종료된 태스크의 잔존 커넥션을 확인한 뒤 [`mysql.rds_kill`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.CommonDBATasks.End.html)로 종료
+- 만료 설정: 세션의 `wait_timeout` 확인
+- 커넥션 상한: DB별 `max_connections`와 배포 중 태스크·풀·다른 클라이언트의 합계 비교
+
 ## 결과
 
 ### TOBE
