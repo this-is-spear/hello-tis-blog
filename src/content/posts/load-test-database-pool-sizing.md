@@ -136,7 +136,30 @@ DB 풀 조정 후에도 서버 CPU가 98.9%까지 상승했습니다. 태스크�
 - 메모리 사용률: 표시 구간 최대 약 24.24%
 - API p99: 3초 초과
 
-처리량은 늘었지만 지연이 남았습니다. **로직의 CPU·스레드 점유가 Lettuce 이벤트 루프 실행을 지연시킨다는 가설**을 세우고 CPU 증설을 함께 적용했습니다. [Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)합니다.
+처리량은 늘었지만 지연이 남았습니다. **서버 CPU 경합이 Lettuce 이벤트 루프 실행을 지연시킨다는 가설**을 세우고 CPU 증설을 함께 적용했습니다.
+
+**Lettuce 실행 흐름**
+
+공식 구현의 일반 명령 처리 흐름을 단순화한 의사 코드입니다.
+
+```java
+// 호출 스레드: 비동기 명령 제출
+RedisFuture<String> future = async.set(key, value);
+// 동기 API라면 응답 완료 또는 타임아웃까지 대기
+return awaitOrCancel(future, timeout);
+
+// Netty 이벤트 루프: 명령 전송 → Redis 응답 수신
+onResponse(buffer) {
+    decode(buffer, command); // 응답 해석
+    command.complete();     // Future 완료 → 호출 스레드 대기 해제
+}
+```
+
+동기 호출은 [`FutureSyncInvocationHandler`](https://github.com/redis/lettuce/blob/main/src/main/java/io/lettuce/core/FutureSyncInvocationHandler.java), 응답 처리는 [`CommandHandler`](https://github.com/redis/lettuce/blob/main/src/main/java/io/lettuce/core/protocol/CommandHandler.java) 구현을 참고했습니다.
+
+- 동기 대기: 호출 스레드가 결과를 기다립니다. 대기 자체가 CPU를 계속 소비하지는 않습니다.
+- 이벤트 루프: 응답을 해석하고 Future를 완료합니다. 여기서 실행되는 콜백이 블로킹하면 다른 I/O도 지연됩니다. [Lettuce 공식 문서](https://redis.github.io/lettuce/user-guide/async-api/#consuming-futures)
+- CPU 증설: 이벤트 루프가 CPU를 배정받기까지의 대기를 줄일 수 있다고 판단했습니다. 실제 경합 여부는 CPU 프로파일로 확인해야 합니다.
 
 **태스크 8개 · 태스크당 2 vCPU·4GB**
 
