@@ -86,7 +86,7 @@ tags:
 
 ### DB
 
-[HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 테스트했습니다.
+1차는 [HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 테스트했습니다.
 
 - 최대 풀 크기: Master·Replica 각각 10개
 - 커넥션 획득 타임아웃: 30초
@@ -118,38 +118,40 @@ RPS는 초당 요청 수입니다. Replica CPU 증가분은 `(7.8 − 4.0) / 200
 
 ## 해결
 
-### 풀 크기만 변경해 비교합니다
+### 2차 부하테스트
 
-풀 크기 10을 기준으로 Replica부터 조정할 계획입니다.
+- 테스트 태그: `probe500-pool40`
+- 목표 부하·시간: 500 iteration/s · 3분
+- VU: 초기 1,000개 · 최대 5,000개
 
-| 구분         | 고정 조건                                               | 변경할 항목         |
-| ------------ | ------------------------------------------------------- | ------------------- |
-| 부하 발생기  | EC2, 500 iteration/s, 3분, 초기 VU 1,000개·최대 5,000개 | 없음                |
-| 애플리케이션 | 인스턴스 수, 코드, 타임아웃, 커넥션 수명                | 대상 풀의 최대 크기 |
-| DB           | 데이터 규모, 인스턴스 클래스                            | 없음                |
-
-튜닝 순서와 기준입니다.
-
-- 2차 계획: Master 10개 유지, Replica 20개로 변경
-- Replica 30 → 40개 검토 조건: 획득 시간 p99·미시작 iteration 감소, 쿼리 p99·HTTP 실패율 증가 없음
-- Master 조정: 쓰기 요청의 획득 시간 p99를 측정한 뒤 결정
-- 증설 중단 조건: 처리량 증가 없이 쿼리 p99 증가
-
-DB별 커넥션 예산에는 모든 애플리케이션 인스턴스와 배치·관리 접속을 합산합니다. [HikariCP 풀 크기 가이드](https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing)를 참고했습니다.
+Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용값을 확인한 뒤 기록합니다.
 
 ## 결과
 
 ### TOBE
 
+**2차 부하테스트: `pool40` 태그**
+
 | API                     | 풀 변경 후 p99 |
 | ----------------------- | -------------: |
-| 토큰 발급               |                |
-| 출석 상태 조회(`today`) |                |
-| 출석 확정               |                |
-| 현황판 조회(`board`)    |                |
+| 토큰 발급               |         28.28s |
+| 출석 상태 조회(`today`) |         28.54s |
+| 출석 확정               |         28.41s |
+| 현황판 조회(`board`)    |         28.29s |
 
-- 튜닝 효과: 응답 시간, 처리량, HTTP 실패율, 미시작 iteration 비교
-- 원인 검증: 커넥션 획득 시간, 서버·DB CPU 사용률, 쿼리 p99, Redis 명령 처리 시간 확인
-- 부하 확대 조건: 모든 API p99 < 3초, HTTP 실패율 < 0.1%, 미시작 iteration 0건
-- 부하 확대 순서: 500 → 1,000 → 2,000 iteration/s
-- 운영 사양 확정: 운영 데이터 규모와 사용자별 7일 이상 이력을 반영해 재검증
+1차 → 2차 비교입니다.
+
+- 완료 iteration: 28,885 → 66,558건
+- 미시작 iteration: 61,116 → 23,443건
+- HTTP 실패: 436 / 60,374 → 0 / 139,068건
+- HTTP 응답 시간 p50: 15.88초 → 379.87ms
+
+2차는 28초에 VU 5,000개에 도달했습니다. 모든 API의 p99가 3초 기준을 초과했습니다.
+
+### 다음 측정
+
+- DB 풀: 획득 시간 p99·대기 요청 수·사용 중 커넥션 수
+- 서버: 같은 부하 구간의 CPU·Tomcat 사용 중 스레드 수·커넥션 수
+- 설정: Master·Replica별 풀 크기·획득 타임아웃·Tomcat 스레드 상한
+
+HTTP 실패율만으로는 DB 획득 대기나 Tomcat 대기 시간을 알 수 없습니다. [HikariCP](https://github.com/brettwooldridge/HikariCP#frequently-used)와 [Tomcat](https://tomcat.apache.org/tomcat-10.1-doc/config/http.html)의 지표·설정을 함께 확인합니다.
