@@ -196,27 +196,21 @@ CPU 증설 전보다 비교 트레이스의 Redis 호출 지연도 줄었습니�
 
 ### 트러블슈팅 · Too many connections
 
+#### 롤링 배포 중 커넥션 여유 확보
+
 태스크 수를 늘렸다 줄이는 과정에서 커넥션이 부족해 `Too many connections`가 발생했습니다. 기존 태스크를 강제로 종료하고 커넥션 여유를 확보한 뒤 교체하기도 했습니다.
 
-`processlist`를 IP별로 집계했습니다. `host`는 `IP:포트`이므로 포트를 제외해 합산했습니다.
+현재 롤링 배포는 신규 태스크를 먼저 늘린 뒤 기존 태스크를 종료합니다. 신규·기존 태스크가 공존하는 동안 DB 커넥션도 증가해 교체가 막힐 수 있습니다. [ECS 롤링 배포](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html)
 
-- 전체 커넥션: 161개 중 `Sleep` 160개
-- 10개 IP: 각각 15개, 총 150개 모두 `Sleep`
-- 해당 IP별 최대 유휴 시간: 198 ~ 273초
+**풀 크기는 평상시 태스크 수가 아닌 배포 중 최대 태스크 수를 기준으로 산정해야 한다는 점을 배웠습니다.** DB별로 태스크당 풀 상한을 곱하고, 다른 클라이언트와 잔존 커넥션을 위한 여유도 확보해야 합니다.
 
-[`Sleep`은 유휴 상태](https://dev.mysql.com/doc/refman/8.0/en/sys-processlist.html)입니다. 종료된 태스크의 커넥션인지는 태스크 IP와 대조해야 합니다.
+#### 비정상 종료 후 커넥션 회수
 
-현재 롤링 배포는 신규 태스크를 먼저 늘린 뒤 기존 태스크를 종료합니다. 두 태스크가 공존하는 동안 DB 커넥션 수가 증가하므로, 신규 태스크가 커넥션을 확보하지 못해 교체가 막힐 수 있습니다. [ECS 롤링 배포](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html)
+정상 종료에서는 [`HikariDataSource.close()`](https://github.com/brettwooldridge/HikariCP/wiki/FAQ#q-how-do-i-properly-shutdown-the-hikaricp-datasource)가 호출되면 풀이 커넥션을 정리합니다. 이 과정에서 비정상 종료까지 고려해야 한다는 생각이 들었습니다.
 
-정상 종료에서는 [`HikariDataSource.close()`](https://github.com/brettwooldridge/HikariCP/wiki/FAQ#q-how-do-i-properly-shutdown-the-hikaricp-datasource)가 호출되면 풀이 커넥션을 정리합니다. 비정상 종료·네트워크 단절로 DB가 연결 종료를 감지하지 못하면 커넥션이 남을 수 있습니다. 잔존 커넥션으로 [`max_connections`에 도달하면 새 태스크도 커넥션을 확보하지 못합니다](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html).
+비정상 종료·네트워크 단절로 DB가 연결 종료를 감지하지 못하면 커넥션이 남을 수 있습니다. 잔존 커넥션으로 [`max_connections`에 도달하면 새 태스크도 커넥션을 확보하지 못합니다](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html).
 
-**풀 크기는 롤링 배포 중 늘어나는 태스크까지 계산하고, 종료 후 잔존 커넥션 회수에도 대비해야 한다는 점을 배웠습니다.** 후속 검증 항목으로 남겼습니다.
-
-- 정상 종료: 종료 유예 시간 내 풀 종료·커넥션 해제 확인
-- 비정상 종료: 강제 종료·네트워크 단절 후 커넥션 회수 시간 검증
-- 잔존 확인·정리: 실행 중·종료 중인 태스크 IP와 대조하고, 종료된 태스크의 잔존 커넥션만 [`mysql.rds_kill`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.CommonDBATasks.End.html)로 종료
-- 만료 설정: 유휴 커넥션의 [`wait_timeout`](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_wait_timeout) 검토
-- 커넥션 상한: DB별로 배포 중 최대 태스크 수 × 태스크당 풀 상한에 잔존 커넥션·다른 클라이언트·여유분을 더해 산정
+**정상 종료의 풀 정리와 비정상 종료 후 커넥션 회수를 함께 대비해야 한다는 점을 배웠습니다.** 종료 유예 시간, 유휴 커넥션 만료 설정, 장애 시 회수 시간을 확인해야 합니다.
 
 ## 결과
 
