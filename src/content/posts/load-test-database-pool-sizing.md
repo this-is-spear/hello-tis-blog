@@ -32,6 +32,8 @@ tags:
 
 ## 원인
 
+요청 트레이스로 지연 구간을 찾고, 서버·Redis·DB 지표를 비교해 원인을 좁혀가기로 했습니다.
+
 **출석 상태 조회(`today`)**
 
 ![초기 today 트레이스. 전체 1.09s, Redis set 205.29ms, connection 486.69ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-today-trace.png)
@@ -48,7 +50,7 @@ tags:
 - Redis `set`: 384.48ms
 - `connection` span: 289.62ms
 
-두 요청에서 Redis 호출과 DB 처리 지연을 확인했습니다. 조정할 대상을 찾기 위해 서버·Redis·DB 상태를 차례로 분석했습니다.
+두 요청에서 Redis 호출과 DB 처리 지연을 확인했습니다.
 
 ### 서버 · CPU 사용률 100%
 
