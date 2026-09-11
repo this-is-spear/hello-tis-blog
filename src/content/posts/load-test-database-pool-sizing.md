@@ -154,7 +154,7 @@ onResponse(buffer) {
 동기 호출은 [`FutureSyncInvocationHandler`](https://github.com/redis/lettuce/blob/main/src/main/java/io/lettuce/core/FutureSyncInvocationHandler.java), 응답 처리는 [`CommandHandler`](https://github.com/redis/lettuce/blob/main/src/main/java/io/lettuce/core/protocol/CommandHandler.java) 구현을 참고했습니다.
 
 - 동기 대기: 호출 스레드가 결과를 기다립니다. 대기 자체가 CPU를 계속 소비하지는 않습니다.
-- 이벤트 루프: 응답을 해석하고 Future를 완료합니다. 여기서 실행되는 콜백이 블로킹하면 다른 I/O도 지연됩니다. [Lettuce 공식 문서](https://redis.github.io/lettuce/user-guide/async-api/#consuming-futures)
+- 이벤트 루프: 응답을 해석하고 Future를 완료합니다. 여기서 실행되는 콜백이 블로킹하면 다른 I/O도 지연됩니다.
 - CPU 증설: 이벤트 루프가 CPU를 배정받기까지의 대기를 줄일 수 있다고 판단했습니다. 실제 경합 여부는 CPU 프로파일로 확인해야 합니다.
 
 **태스크 8개 · 태스크당 2 vCPU·4GB**
@@ -200,7 +200,7 @@ CPU 증설 전보다 비교 트레이스의 Redis 호출 지연도 줄었습니�
 
 태스크 수를 늘렸다 줄이는 과정에서 커넥션이 부족해 `Too many connections`가 발생했습니다. 기존 태스크를 강제로 종료하고 커넥션 여유를 확보한 뒤 교체하기도 했습니다.
 
-현재 롤링 배포는 신규 태스크를 먼저 늘린 뒤 기존 태스크를 종료합니다. 신규·기존 태스크가 공존하는 동안 DB 커넥션도 증가해 교체가 막힐 수 있습니다. [ECS 롤링 배포](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html)
+현재 롤링 배포는 신규 태스크를 먼저 늘린 뒤 기존 태스크를 종료합니다. 신규·기존 태스크가 공존하는 동안 DB 커넥션도 증가해 교체가 막힐 수 있습니다.
 
 **풀 크기는 평상시 태스크 수가 아닌 배포 중 최대 태스크 수를 기준으로 산정해야 한다는 점을 배웠습니다.** DB별로 태스크당 풀 상한을 곱하고, 다른 클라이언트와 잔존 커넥션을 위한 여유도 확보해야 합니다.
 
