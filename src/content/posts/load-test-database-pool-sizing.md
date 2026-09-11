@@ -32,22 +32,6 @@ tags:
 
 ## 원인
 
-초기 상태를 서버·Redis·DB로 나눠 분석했습니다.
-
-### 서버 · CPU 100%
-
-![초기 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
-
-- CPU 사용률: 최대 약 100%
-- 메모리 사용률: 최대 약 30.5%
-
-### Redis · 낮은 사용률에도 요청 지연
-
-![Redis 엔진 CPU·메모리 사용률과 부하 구간. 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
-
-- 엔진 CPU 사용률: 최대 약 0.87%
-- 메모리 사용률: 최대 약 3.88%
-
 **출석 상태 조회(`today`)**
 
 ![초기 today 트레이스. 전체 1.09s, Redis set 205.29ms, connection 486.69ms](@/assets/images/load-test-database-pool-sizing/probe500-pool10-today-trace.png)
@@ -63,6 +47,22 @@ tags:
 - 전체: 698.75ms
 - Redis `set`: 384.48ms
 - `connection` span: 289.62ms
+
+두 요청에서 Redis 호출과 DB 처리 지연을 확인했습니다. 각 인프라 상태에 맞춰 조정할 항목을 찾기 위해 서버·Redis·DB를 나눠 분석했습니다.
+
+### 서버 · CPU 100%
+
+![초기 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/server-resources.png)
+
+- CPU 사용률: 최대 약 100%
+- 메모리 사용률: 최대 약 30.5%
+
+### Redis · 낮은 사용률에도 요청 지연
+
+![Redis 엔진 CPU·메모리 사용률과 부하 구간. 원본 화면 기반 근사 그래프](@/assets/images/load-test-database-pool-sizing/redis-cpu-memory.png)
+
+- 엔진 CPU 사용률: 최대 약 0.87%
+- 메모리 사용률: 최대 약 3.88%
 
 ### DB · 커넥션 획득 지연
 
@@ -123,45 +123,49 @@ DB 풀 조정 후에도 서버 CPU가 98.9%까지 상승했습니다. 태스크�
 
 **변경 사항**
 
-태스크를 **2 → 4개**로 늘렸습니다. 태스크당 1 vCPU·4GB는 유지했습니다.
+- 먼저 태스크를 2 → 4개로 늘리고, 태스크당 1 vCPU·4GB를 유지했습니다.
+- 이후 태스크를 4 → 8개로 늘리면서 CPU도 1 → 2 vCPU로 증설했습니다.
 
 **측정 결과**
 
-- API p99: 3초 초과
+**태스크 4개**
 
 ![태스크 증설 전후 서버 CPU·메모리 사용률. 15:50 ~ 16:20의 근사 그래프](@/assets/images/load-test-database-pool-sizing/ecs-scale-out-server-resources.png)
 
 - CPU 사용률: 표시 구간 최대 약 100%
 - 메모리 사용률: 표시 구간 최대 약 24.24%
+- API p99: 3초 초과
 
-태스크 증설로 완료 건수는 늘었지만, API p99는 기준을 초과했습니다. 증설 후 Redis 지연은 해당 단계의 트레이스로 별도 확인해야 합니다.
+처리량은 늘었지만 지연이 남았습니다. **로직의 CPU·스레드 점유가 Lettuce 이벤트 루프 실행을 지연시킨다는 가설**을 세우고 CPU 증설을 함께 적용했습니다. [Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)합니다.
 
-### 3차 개선 · CPU 증설
-
-**판단 이유**
-
-태스크 증설만으로 응답 시간 기준을 충족하지 못했습니다. 앞선 Redis 지연과 서버 CPU 사용률을 근거로 **로직의 CPU·스레드 점유가 Lettuce 이벤트 루프 실행을 지연시킨다는 가설**을 세웠습니다.
-
-[Lettuce는 이벤트 루프로 I/O를 처리](https://redis.github.io/lettuce/advanced-usage/client-resources/)하므로, 태스크당 CPU를 늘려 변화를 확인하기로 했습니다.
-
-**변경 사항**
-
-- CPU: 태스크당 1 → 2 vCPU
-- 태스크: 4 → 8개, 이후 5개로 축소해 재측정
-- 메모리: 태스크당 4GB 유지
-
-**측정 결과**
-
-**태스크 8개**
+**태스크 8개 · 태스크당 2 vCPU·4GB**
 
 ![CPU 증설·태스크 8개에서의 HTTP 응답 시간 추이](@/assets/images/load-test-database-pool-sizing/probe500-ecs8-response-time.png)
 
 - API p99: 모두 3초 미만
 - 최대 응답 시간: 10.74초
 
-**태스크 5개**
+### 3차 개선 · 태스크 축소 검증
 
-최대 응답 시간도 3초 미만이었고, Redis 호출 지연도 줄었습니다. 전체 테스트 통계는 결과에 정리했습니다.
+**판단 이유**
+
+CPU를 증설한 구성에서 p99 기준을 충족했습니다. 태스크를 줄여도 응답 시간 기준을 유지하는지 확인하기로 했습니다.
+
+**변경 사항**
+
+태스크당 2 vCPU·4GB를 유지하고, 태스크를 8 → 5개로 줄였습니다.
+
+**측정 결과**
+
+**최종 구성: 태스크 5개 · 태스크당 2 vCPU·4GB**
+
+![최종 구성의 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs5-response-time.png)
+
+그래프는 전체 요청의 max·p95·p90·min입니다. 앞선 그래프와 축 범위는 다릅니다.
+
+- 최대 응답 시간: 603.41ms
+
+검증한 부하에서는 응답 시간 기준을 충족했습니다. 더 높은 부하는 다음 측정으로 남겼습니다.
 
 ![17:10:00.266의 today 트레이스. 전체 310.68ms, Redis set 8.11ms, connection 302.21ms](@/assets/images/load-test-database-pool-sizing/today-trace-171000.png)
 
@@ -169,7 +173,7 @@ DB 풀 조정 후에도 서버 CPU가 98.9%까지 상승했습니다. 태스크�
 - Redis `set`: 8.11ms
 - `connection` span: 302.21ms
 
-트레이스는 단일 요청 비교입니다. CPU·태스크 수·배포 상태가 함께 달라졌으므로 스레드 점유 가설은 별도 검증합니다.
+CPU 증설 전보다 비교 트레이스의 Redis 호출 지연도 줄었습니다. CPU·태스크 수·배포 상태가 함께 달라졌으므로 스레드 점유 가설은 별도 검증합니다.
 
 ### 트러블슈팅 · Too many connections
 
@@ -189,16 +193,6 @@ DB 풀 조정 후에도 서버 CPU가 98.9%까지 상승했습니다. 태스크�
 - 커넥션 상한: DB별 `max_connections`와 배포 중 태스크·풀·다른 클라이언트의 합계 비교
 
 ## 결과
-
-**최종 구성: 태스크 5개 · 태스크당 2 vCPU·4GB**
-
-![최종 구성의 HTTP 응답 시간 추이. max·p95·p90·min](@/assets/images/load-test-database-pool-sizing/probe500-ecs5-response-time.png)
-
-그래프는 전체 요청의 max·p95·p90·min입니다. 앞선 그래프와 축 범위는 다릅니다.
-
-- 최대 응답 시간: 603.41ms
-
-검증한 부하에서는 응답 시간 기준을 충족했습니다. 더 높은 부하는 다음 측정으로 남겼습니다.
 
 ### 튜닝 기준
 
@@ -220,14 +214,14 @@ DB별 커넥션 상한에는 배포 중 태스크와 다른 클라이언트도 �
 
 각 개선 직전과 직후를 비교했습니다.
 
-| 개선                 | 항목                             | ASIS                   | TOBE                        |
-| -------------------- | -------------------------------- | ---------------------- | --------------------------- |
-| DB 풀 조정           | Master 획득 p99 · 구간 최대      | 1.25초                 | 691ms                       |
-| DB 풀 조정           | Replica 획득 p99 · 구간 최대     | 1.36초                 | 383ms                       |
-| DB 풀 조정           | SELECT 실행 평균 · 조회 트레이스 | 24.75ms                | 106.84ms                    |
-| 태스크 증설          | 처리량                           | 변경 전 기준           | 증가                        |
-| 태스크 증설          | API 응답 시간                    | 기준 초과              | 감소했지만 기준 초과        |
-| CPU 증설·태스크 조정 | API 응답 시간                    | 기준 초과              | 검증한 부하에서 기준 충족   |
-| CPU 증설·태스크 조정 | Redis 호출                       | 트레이스에서 지연 확인 | 비교 트레이스에서 지연 감소 |
+| 개선                   | 항목                             | ASIS         | TOBE                      |
+| ---------------------- | -------------------------------- | ------------ | ------------------------- |
+| DB 풀 조정             | Master 획득 p99 · 구간 최대      | 1.25초       | 691ms                     |
+| DB 풀 조정             | Replica 획득 p99 · 구간 최대     | 1.36초       | 383ms                     |
+| DB 풀 조정             | SELECT 실행 평균 · 조회 트레이스 | 24.75ms      | 106.84ms                  |
+| 태스크 증설            | 처리량                           | 변경 전 기준 | 증가                      |
+| CPU·태스크 증설        | API p99                          | 기준 초과    | 기준 충족                 |
+| 태스크 축소 검증       | 최대 응답 시간                   | 기준 초과    | 검증한 부하에서 기준 충족 |
+| CPU 증설 전후 트레이스 | Redis 호출                       | 지연 확인    | 지연 감소                 |
 
 획득 시간은 p99의 구간 최댓값입니다. 실행 평균은 조정 전후 `today` 트레이스에서 각각 SELECT 세 건의 시간을 평균한 값입니다.
