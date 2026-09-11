@@ -86,6 +86,17 @@ tags:
 
 ### DB
 
+#### 2차 커넥션
+
+![2차 커넥션 획득 시간 p99. 표시 구간 최대 Master 691ms, Replica 383ms](@/assets/images/load-test-database-pool-sizing/probe500-pool40-connection-acquire.png)
+
+- Master: 획득 p99 최대 691ms · 점유 p99 최대 1.26초
+- Replica: 획득 p99 최대 383ms · 점유 p99 최대 504ms
+
+최댓값은 화면 표시 구간 기준입니다.
+
+#### 1차 설정
+
 1차는 [HikariCP 기본값](https://github.com/brettwooldridge/HikariCP#frequently-used)으로 테스트했습니다.
 
 - 최대 풀 크기: Master·Replica 각각 10개
@@ -150,8 +161,7 @@ Master·Replica별 풀 크기와 커넥션 획득 타임아웃은 실제 적용�
 
 ### 다음 측정
 
-- DB 풀: 획득 시간 p99·대기 요청 수·사용 중 커넥션 수
+다음 분석 대상은 서버입니다.
+
 - 서버: 같은 부하 구간의 CPU·Tomcat 사용 중 스레드 수·커넥션 수
 - 설정: Master·Replica별 풀 크기·획득 타임아웃·Tomcat 스레드 상한
-
-HTTP 실패율만으로는 DB 획득 대기나 Tomcat 대기 시간을 알 수 없습니다. [HikariCP](https://github.com/brettwooldridge/HikariCP#frequently-used)와 [Tomcat](https://tomcat.apache.org/tomcat-10.1-doc/config/http.html)의 지표·설정을 함께 확인합니다.
