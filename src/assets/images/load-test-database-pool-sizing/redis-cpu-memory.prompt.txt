@@ -1,0 +1,11 @@
+Create a single clean Korean time-series chart from the attached ORIGINAL monitoring screenshot. Redraw only EngineCPUUtilization (top row second panel) and DatabaseMemoryUsagePercentage (top row third panel). White background, crisp dark typography, thin light gray grid, restrained blue solid CPU curve and orange dashed memory curve. One unified plotting area, NOT separate panels. Minimal text. Wide landscape about1536x900.
+Title exactly "Redis CPU·메모리 사용률". Legend "엔진 CPU" blue solid and "메모리" orange dashed.
+Use ONE COMMON y-axis in percent, from0% to4%, ticks0%,1%,2%,3%,4%. This accurately compares absolute usage levels and avoids misleading dual scales.
+Shared time axis12:25 through15:15. Labeled ticks12:30,13:00,13:30,14:00,14:30,15:00 uniformly spaced.
+Closely reproduce the ORIGINAL source shapes and temporal positions using tick calibration:
+CPU is near0.28-0.30% throughout, small bump around13:20 to~.31%, sharp narrow peak at about13:50 reaching0.87%, falls back by13:55, small bump14:05~.34%, ends near.30%. The peak must be under1% on the common scale.
+Memory baseline1.69%, small ripple around13:25, steep rise around13:45-13:55, short flat top at3.88% around13:55-14:00, steep decline returning to1.69% by14:10, then flat to15:15. Preserve this late plateau, not a single triangular spike. Keep data through15:15; the new screenshot includes the test interval.
+Highlight13:51 to13:54 as a thin translucent purple vertical band with dashed purple boundaries spanning the plotting area. Band width must represent3minutes out of170minutes (~1.8% of plot width) and be located just BEFORE14:00, OVER the observed CPU decline and memory rise. One small callout above the plot with a leader: "부하테스트 13:51 ~ 13:54". Do not mark another interval or shift the curves to force peaks into the test band.
+Label the CPU peak near the curve: "최대 약 0.87%". Label memory plateau: "최대 약 3.88%". No additional numbers or explanations beyond axes, legend, these labels and callout.
+Small footer "원본 화면 기반 근사 그래프".
+Do NOT include '자원 지표 미확인', old ranges0.28-0.31 or1.69-1.72, resource summary cards, conclusions, icons, swap, host CPU, fragmentation, cache, or freeable memory. The input is a reference for approximate visual reconstruction, not an image to paste.
