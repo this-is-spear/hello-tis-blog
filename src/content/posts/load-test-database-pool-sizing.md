@@ -208,12 +208,15 @@ CPU 증설 전보다 비교 트레이스의 Redis 호출 지연도 줄었습니�
 
 [`Sleep`은 유휴 상태](https://dev.mysql.com/doc/refman/8.0/en/sys-processlist.html)입니다. 종료된 태스크의 커넥션인지는 태스크 IP와 대조해야 합니다.
 
-후속 확인·조치입니다.
+정상 종료에서는 [`HikariDataSource.close()`](https://github.com/brettwooldridge/HikariCP/wiki/FAQ#q-how-do-i-properly-shutdown-the-hikaricp-datasource)가 호출되면 풀이 커넥션을 정리합니다. 비정상 종료·네트워크 단절로 DB가 연결 종료를 감지하지 못하면 커넥션이 남을 수 있습니다. 잔존 커넥션으로 [`max_connections`에 도달하면 새 태스크도 커넥션을 확보하지 못합니다](https://dev.mysql.com/doc/refman/8.0/en/too-many-connections.html).
 
-- IP 대조: 실행 중·종료 중인 태스크와 커넥션 IP 비교
-- 정리: 종료된 태스크의 잔존 커넥션을 확인한 뒤 [`mysql.rds_kill`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.CommonDBATasks.End.html)로 종료
-- 만료 설정: 세션의 `wait_timeout` 확인
-- 커넥션 상한: DB별 `max_connections`와 배포 중 태스크·풀·다른 클라이언트의 합계 비교
+**종료 처리와 잔존 커넥션 회수까지 대비해야 한다는 점을 배웠습니다.** 후속 검증 항목으로 남겼습니다.
+
+- 정상 종료: 종료 유예 시간 내 풀 종료·커넥션 해제 확인
+- 비정상 종료: 강제 종료·네트워크 단절 후 커넥션 회수 시간 검증
+- 잔존 확인·정리: 실행 중·종료 중인 태스크 IP와 대조하고, 종료된 태스크의 잔존 커넥션만 [`mysql.rds_kill`](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Appendix.MySQL.CommonDBATasks.End.html)로 종료
+- 만료 설정: 유휴 커넥션의 [`wait_timeout`](https://dev.mysql.com/doc/refman/8.0/en/server-system-variables.html#sysvar_wait_timeout) 검토
+- 커넥션 상한: 배포 중 태스크·잔존 커넥션·다른 클라이언트를 포함해 여유 확보
 
 ## 결과
 
