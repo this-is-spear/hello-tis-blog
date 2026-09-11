@@ -103,8 +103,6 @@ DB 풀을 조정하고, 태스크는 1 vCPU·4GB, 2개를 유지했습니다.
 
 커넥션 획득 대기는 줄었지만, 비교 트레이스의 SELECT 실행 평균은 증가했습니다. API 지연도 남아 서버 CPU·Redis 호출을 확인하고 태스크 증설로 이어갔습니다.
 
-![DB 풀 조정 후 서버 CPU·메모리 사용률](@/assets/images/load-test-database-pool-sizing/probe500-pool40-server-resources.png)
-
 - CPU 사용률: 최대 약 98.9%
 - 메모리 사용률: 최대 약 24.24%
 
@@ -129,8 +127,6 @@ DB 풀 조정 후에도 서버 CPU가 98.9%까지 상승했습니다. 태스크�
 **측정 결과**
 
 **태스크 4개**
-
-![태스크 증설 전후 서버 CPU·메모리 사용률. 15:50 ~ 16:20의 근사 그래프](@/assets/images/load-test-database-pool-sizing/ecs-scale-out-server-resources.png)
 
 - CPU 사용률: 표시 구간 최대 약 100%
 - 메모리 사용률: 표시 구간 최대 약 24.24%
