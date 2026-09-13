@@ -1,9 +1,9 @@
 ---
-title: "CDC 컨슈머 처리량을 초당 3만 건에서 8만 건으로 올리기"
+title: "[26.08.24] CDC 컨슈머 처리량을 초당 3만 건에서 8만 건으로 올리기"
 description: 로컬에 Debezium과 MySQL binlog로 CDC 파이프라인을 만들고 초당 19만 건을 넣어 lag을 115만까지 쌓았다. 설정과 코드를 하나씩만 바꿔 재면서 컨슈머 병목을 찾은 기록이다.
 pubDatetime: 2026-08-24T00:00:00Z
 tags:
-  - Study
+  - Scratchpad
 ---
 
 ## 개요

@@ -21,9 +21,13 @@ const definitions: { slug: string; name: string; tags: TopicTag[] }[] = [
       { slug: "operations", name: "운영", topic: "Operations" },
       { slug: "platform", name: "플랫폼", topic: "Platform" },
       { slug: "product", name: "제품", topic: "Product" },
-      { slug: "scratchpad", name: "낙서장", topic: "Scratchpad" },
       { slug: "study", name: "학습", topic: "Study" },
     ],
+  },
+  {
+    slug: "scratchpad",
+    name: "낙서장",
+    tags: [{ slug: "scratchpad", name: "낙서장", topic: "Scratchpad" }],
   },
   {
     slug: "review",
@@ -89,7 +93,7 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
   <div
     role="tablist"
     aria-label="글 주제"
-    class="border-border mb-5 flex gap-2 border-b"
+    class="border-border mb-5 flex gap-1 border-b sm:gap-2"
   >
     {
       groups.map((group, index) => (
@@ -101,7 +105,7 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
           aria-selected={index === 0 ? "true" : "false"}
           aria-controls={`panel-${group.slug}`}
           tabindex={index === 0 ? 0 : -1}
-          class="text-muted-foreground hover:text-foreground -mb-px inline-flex items-center gap-2 border-b-2 border-transparent px-4 py-3 text-base font-semibold transition-colors"
+          class="text-muted-foreground hover:text-foreground -mb-px inline-flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-2 py-3 text-sm font-semibold whitespace-nowrap transition-colors sm:gap-2 sm:px-4 sm:text-base"
         >
           {group.name}
           <span class="text-xs font-normal opacity-70">
@@ -127,25 +131,27 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
         tabindex="0"
         hidden={index !== 0}
       >
-        <nav
-          aria-label={`${group.name} 세부 태그`}
-          class="mb-5 flex flex-wrap gap-2"
-        >
-          {group.filters.map(filter => (
-            <button
-              type="button"
-              data-tag-filter={filter.slug}
-              data-tag-name={filter.name}
-              aria-pressed={filter.slug === "all" ? "true" : "false"}
-              class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
-            >
-              {filter.name}
-              <span data-filter-count class="text-xs opacity-70">
-                {filter.count}
-              </span>
-            </button>
-          ))}
-        </nav>
+        {group.tags.length > 1 && (
+          <nav
+            aria-label={`${group.name} 세부 태그`}
+            class="mb-5 flex flex-wrap gap-2"
+          >
+            {group.filters.map(filter => (
+              <button
+                type="button"
+                data-tag-filter={filter.slug}
+                data-tag-name={filter.name}
+                aria-pressed={filter.slug === "all" ? "true" : "false"}
+                class="border-border hover:border-accent hover:text-accent inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-colors"
+              >
+                {filter.name}
+                <span data-filter-count class="text-xs opacity-70">
+                  {filter.count}
+                </span>
+              </button>
+            ))}
+          </nav>
+        )}
 
         <div data-post-grid class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {group.entries.map(({ post, tag }) => (
@@ -224,7 +230,7 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
       );
       const selectedFilter =
         filters.find(filter => filter.dataset.tagFilter === tag) ?? filters[0];
-      const selectedTag = selectedFilter.dataset.tagFilter!;
+      const selectedTag = selectedFilter?.dataset.tagFilter ?? "all";
 
       panels.forEach(item => (item.hidden = item !== panel));
       tabs.forEach(tab => {
@@ -245,7 +251,7 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
       const emptyState = panel.querySelector<HTMLElement>("[data-empty-state]");
       if (emptyState) emptyState.hidden = count > 0;
       if (status) {
-        status.textContent = `${panel.dataset.topicName} ${selectedFilter.dataset.tagName} 글 ${count}개`;
+        status.textContent = `${panel.dataset.topicName} ${selectedFilter?.dataset.tagName ?? "전체"} 글 ${count}개`;
       }
 
       const url = new URL(window.location.href);
@@ -264,6 +270,13 @@ const dateFormatter = new Intl.DateTimeFormat("ko-KR", {
 
     function restoreSelection() {
       const params = new URL(window.location.href).searchParams;
+      if (
+        params.get("tab") === "development" &&
+        params.get("tag") === "scratchpad"
+      ) {
+        select("scratchpad", "all");
+        return;
+      }
       select(
         params.get("tab") ?? panels[0]?.dataset.topicPanel ?? "development",
         params.get("tag") ?? "all",
