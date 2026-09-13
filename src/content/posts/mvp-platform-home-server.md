@@ -1,7 +1,7 @@
 ---
 title: "[26.09.14] 홈 서버에 MVP를 배포하고 사내 적용 준비하기"
 description: 사내 도입을 준비하며, 반복되는 프로젝트 준비와 변경 반영을 플랫폼에 맡긴 과정을 정리했습니다.
-pubDatetime: 2026-09-14T00:00:00Z
+pubDatetime: 2026-09-13T15:00:00Z
 tags:
   - Scratchpad
 ---
