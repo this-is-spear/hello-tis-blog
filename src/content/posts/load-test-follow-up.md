@@ -58,13 +58,13 @@ Fluent Bit은 콘솔 로그의 `logtype`을 읽고, `rewrite_tag` 필터로 목�
 
 마지막 `false`는 [기존 태그의 로그를 남기지 않는 설정](https://docs.fluentbit.io/manual/data-pipeline/filters/rewrite-tag)으로, Splunk로 분기한 로그가 CloudWatch에도 전송되는 것을 막습니다. `logtype`이 없는 로그도 CloudWatch로 보냅니다.
 
-### 애플리케이션과 Fluent Bit의 역할
+### 확장성을 고려한 애플리케이션과 Fluent Bit의 역할
 
-현재 `logtype`의 `system`은 로그 종류를, `splunk`는 목적지를 뜻합니다. 목적지가 늘어나면 이 기준도 다시 정해야 할 것 같습니다.
+목적지가 늘어나도 애플리케이션의 로그 생성 코드를 그대로 쓸 수 있도록 역할을 나누고 싶습니다. 애플리케이션은 로그 종류와 내용을 정하고, Fluent Bit은 로그를 분기해 목적지에 맞는 형식으로 보내는 구조입니다.
 
-애플리케이션은 로그 종류와 내용을 정하고, Fluent Bit은 목적지와 전송 형식을 정하는 구조를 생각하고 있습니다. 목적지를 추가할 때 애플리케이션 코드를 얼마나 바꿔야 하는지로 추상화 수준을 판단하려고 합니다.
+현재 `logtype`의 `system`은 로그 종류를, `splunk`는 목적지를 뜻합니다. PoC에서는 이 설정으로 분기하되, 공통 적용 단계에서는 로그 종류를 기준으로 통일할지 검토하려고 합니다. 그러면 목적지가 바뀌어도 애플리케이션의 `logtype`을 유지하고 Fluent Bit의 분기 설정을 바꿀 수 있습니다.
 
-현재 `Splunk_Send_Raw On` 설정은 [`event`를 포함한 HEC 형식을 그대로 전송합니다](https://docs.fluentbit.io/manual/data-pipeline/outputs/splunk). 애플리케이션이 이 형식을 만들고 있다면, 변환을 Fluent Bit에 맡길지 검토하려고 합니다. 콘솔 출력에 추가된 필드까지 포함해 최종 HEC 요청도 확인해야 합니다.
+전송 형식도 같은 기준으로 나누려고 합니다. 애플리케이션이 Splunk HEC 형식을 직접 만들고 있다면, 그 변환을 Fluent Bit에 맡길지 검토할 계획입니다. 목적지를 추가할 때 애플리케이션 코드를 얼마나 바꿔야 하는지, Fluent Bit 설정이 얼마나 복잡해지는지를 함께 보고 공통화 범위를 정하겠습니다.
 
 ### 버퍼와 전송 실패
 
