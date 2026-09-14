@@ -46,11 +46,7 @@ PoC에서는 통계 이벤트가 한 줄의 JSON으로 출력되고, `logtype`�
 
 ### Fluent Bit 분기 설정
 
-1. 로그 드라이버가 붙인 `source`를 `stream`으로 바꿉니다. 통계 이벤트의 `source`와 충돌을 피하기 위해서입니다.
-2. `log` 필드의 JSON을 파싱합니다. `Reserve_Data On`으로 ECS 메타데이터를 유지합니다.
-3. `logtype=splunk`인 로그에 `altools.splunk` 태그를 붙입니다.
-4. Splunk로 보낼 로그에서 분기에 쓴 필드와 지정한 ECS 메타데이터를 제거하고, `event_id`를 `fields` 아래로 옮깁니다.
-5. `altools.splunk` 태그의 로그는 Splunk HEC로, 기존 FireLens 태그의 로그는 CloudWatch로 보냅니다.
+Fluent Bit은 콘솔 로그의 `logtype`을 읽고, `rewrite_tag` 필터로 목적지를 나눕니다. `logtype=splunk`인 로그에는 `altools.splunk` 태그를 붙여 Splunk HEC로 보내고, 나머지는 기존 FireLens 태그를 유지해 CloudWatch로 보냅니다.
 
 ```text file="fluent-bit.conf"
 [FILTER]
@@ -60,11 +56,7 @@ PoC에서는 통계 이벤트가 한 줄의 JSON으로 출력되고, `logtype`�
     Emitter_Name altools_splunk_emitter
 ```
 
-마지막 `false`는 [기존 태그의 로그를 남기지 않는 설정](https://docs.fluentbit.io/manual/data-pipeline/filters/rewrite-tag)입니다. Splunk로 보낸 로그가 CloudWatch에도 전송되는 것을 막습니다. 새 태그는 같은 필터에서 반복 처리되지 않도록 `Match`와 겹치지 않게 정했습니다.
-
-`logtype`이 `splunk`인 로그를 제외한 나머지는 CloudWatch로 보냅니다. `logtype`이 없거나 JSON 파싱에 실패한 로그도 여기에 포함됩니다. 통계 이벤트의 `logtype`이 잘못되면 CloudWatch로 가므로, 이 경우도 PoC에서 확인하려고 합니다.
-
-로그마다 시각 필드가 달라 공통 JSON 파서에는 `Time_Key`를 지정하지 않았습니다. 통계 이벤트의 발생 시각을 HEC의 `time`에 넣을지는 더 정해야 합니다.
+마지막 `false`는 [기존 태그의 로그를 남기지 않는 설정](https://docs.fluentbit.io/manual/data-pipeline/filters/rewrite-tag)으로, Splunk로 분기한 로그가 CloudWatch에도 전송되는 것을 막습니다. `logtype`이 없는 로그도 CloudWatch로 보냅니다.
 
 ### 애플리케이션과 Fluent Bit의 역할
 
@@ -73,8 +65,6 @@ PoC에서는 통계 이벤트가 한 줄의 JSON으로 출력되고, `logtype`�
 애플리케이션은 로그 종류와 내용을 정하고, Fluent Bit은 목적지와 전송 형식을 정하는 구조를 생각하고 있습니다. 목적지를 추가할 때 애플리케이션 코드를 얼마나 바꿔야 하는지로 추상화 수준을 판단하려고 합니다.
 
 현재 `Splunk_Send_Raw On` 설정은 [`event`를 포함한 HEC 형식을 그대로 전송합니다](https://docs.fluentbit.io/manual/data-pipeline/outputs/splunk). 애플리케이션이 이 형식을 만들고 있다면, 변환을 Fluent Bit에 맡길지 검토하려고 합니다. 콘솔 출력에 추가된 필드까지 포함해 최종 HEC 요청도 확인해야 합니다.
-
-`fields` 아래의 `event_id`는 [검색에 쓸 인덱스 필드](https://help.splunk.com/en/splunk-cloud-platform/get-started/get-data-in/10.3.2512/get-data-with-http-event-collector/format-events-for-http-event-collector)입니다. 재시도로 생긴 중복을 처리하는 규칙은 따로 정해야 합니다.
 
 ### 버퍼와 전송 실패
 
