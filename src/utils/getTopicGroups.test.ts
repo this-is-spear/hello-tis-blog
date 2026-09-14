@@ -36,6 +36,7 @@ describe("getTopicGroups", () => {
         "operations",
         "platform",
         "product",
+        "scratchpad",
         "ai",
         "study",
         "weekly-review",

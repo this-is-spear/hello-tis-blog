@@ -1,0 +1,9 @@
+Create one clean wide Korean technical time-series chart from the supplied monitoring screenshot, using ONLY the top two resource panels. Match the established blog style: white background, dark readable Korean title, light gray grid, CPU maximum as blue solid line, memory maximum as orange dashed line. One unified plot. Approximately1536x640.
+Title "2차 서버 CPU·메모리". Legends "CPU 최대" and "메모리 최대".
+A single shared y-axis in percent,0% to100%, ticks0,25,50,75,100%. Shared time-axis ticks15:58,16:00,16:02,16:04,16:06,16:08,16:10 uniformly spaced. Data start slightly before15:58 and end16:10.
+Reconstruct ONLY the orange maximum curves from each ORIGINAL top panel:
+CPU starts near0.67%, small gradual bump to~3%16:01 and~11%16:02, returns~.67%16:03-16:04, then jumps to~74%16:05, peak98.9%16:06,~94%16:07,~41%16:08,returns~.67%16:09-16:10.
+Memory maximum around15.8%15:58-16:01,16.2%16:02-16:04,17.2%16:05,~21.2%16:06,24.24% around16:07-16:08,24%16:09,23.8%16:10.
+Maintain exact timeline alignment and plausible approximate curve shapes from screenshot, not generic curves. Put peak labels "CPU 最大" is NOT allowed: use exact Korean label "CPU 최대 약 98.9%" near CPU peak and "메모리 최대 약 24.24%" near memory plateau. Avoid label overlap.
+Footer "원본 화면 기반 근사 그래프".
+No test-window shading: the exact start/end of this second run has not been supplied. Do not reuse13:51-13:54. No min/average curves, network data, cards, screenshot chrome, explanations, or conclusions. Preserve quantitative scale, minimal text, large legible plot.

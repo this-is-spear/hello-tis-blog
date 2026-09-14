@@ -4,6 +4,7 @@ description: 아웃페인팅 PoC에서 20B 모델의 메모리 한계에 막힌 
 pubDatetime: 2026-07-08T00:00:00Z
 tags:
   - AI
+aiCategory: features
 ---
 
 ## 개요

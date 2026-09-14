@@ -1,0 +1,7 @@
+Create one wide Korean monitoring line chart by redrawing the supplied two-panel screenshot into a unified resource plot. Clean white background, dark legible text, thin gray grid. Same style as earlier blog figures. Title "서버 CPU·메모리 추가 측정". Blue solid CPU maximum, orange dashed memory maximum; legend "CPU 최대", "메모리 최대".
+Shared y-axis 0%-100% with ticks0,25,50,75,100. Shared time axis15:50 to16:20, ticks15:50,15:55,16:00,16:05,16:10,16:15,16:20 uniformly spaced. Original curves before15:50 can be excluded. Only use ORANGE maximum line from each original panel, not min/mean.
+CPU almost0.7% until16:00, tiny rise16:01, small11% bump16:02,0.7%16:03-16:04. First peak:~70%16:05,99%16:06,94%16:07,40%16:08,0.7%16:09-16:10. Second activity:~68%16:11,50%16:12,90%16:13,100%16:14-16:15,50%16:16,70%16:17,50%16:18,68%16:19 (reference data ends just before16:20). Precisely preserve two separated bursts from original, do not flatten the second burst.
+Memory maximum about16%15:50-16:04 then18%16:05,22%16:06,24.24%16:07-16:08,near23.8%16:09-16:13,24%16:14,23.4%16:15-16:19. Keep its plot much lower than CPU using common axis.
+Peak labels "CPU 최대 약 100%" and "메모리 최대 약 24.24%". These refer to the entire displayed interval, not a claim about one run.
+Footer "원본 화면 기반 근사 그래프 · 최댓값은 표시 구간 기준".
+No shading or labels claiming exact second/third test start/end, because test ID/time correlation is not given. No claim of CPU bottleneck, no mean/min lines, no cards, no explanations, no network. Approximately1536x640, large readable graph.

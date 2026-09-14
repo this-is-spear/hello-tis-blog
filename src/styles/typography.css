@@ -27,6 +27,39 @@
       @apply text-foreground;
     }
 
+    .flight-link-comparison {
+      th:first-child {
+        width: 32%;
+      }
+
+      td {
+        vertical-align: top;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+        margin-block: 0;
+      }
+
+      .flight-landing-highlight {
+        position: relative;
+        display: block;
+
+        &::after {
+          content: "";
+          position: absolute;
+          top: 22.7%;
+          left: 71.4%;
+          width: 27.4%;
+          height: 43%;
+          border: 3px solid #dc2626;
+          border-radius: 4px;
+          pointer-events: none;
+        }
+      }
+    }
+
     a {
       @apply text-foreground hover:text-accent wrap-break-word decoration-dashed underline-offset-4 focus-visible:no-underline;
     }
@@ -73,6 +106,22 @@
     /* 이미지 비교 표: 컬럼을 균등 분할해 이미지가 같은 크기로 나오게 한다 */
     table:has(img) {
       @apply w-full table-fixed;
+    }
+
+    .service-comparison {
+      td {
+        vertical-align: top;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2 / 3;
+        object-fit: contain;
+        object-position: top;
+        margin-block: 0;
+        background: white;
+      }
     }
 
     code {
