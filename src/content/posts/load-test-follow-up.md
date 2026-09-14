@@ -22,7 +22,7 @@ Splunk 통계 수집 방식이 서비스마다 다릅니다. API로 보내기도
 
 기존 서비스의 동작을 유지하면서 통계 수집 방식을 추가하는 것이 목표입니다. 일반 로그는 계속 CloudWatch로 보내고, 통계 이벤트는 Splunk로 보내기로 했습니다.
 
-![일반 로그는 CONSOLE과 OTEL로, 통계 이벤트는 CONSOLE로 출력합니다. Fluent Bit은 콘솔 로그를 logtype에 따라 CloudWatch와 Splunk HEC로 보냅니다.](@/assets/images/load-test-follow-up/log-routing.svg)
+![일반 로그는 CONSOLE과 OTEL로, 통계 이벤트는 CONSOLE_RAW로 출력합니다. Fluent Bit은 콘솔 로그를 logtype에 따라 CloudWatch와 Splunk HEC로 보냅니다.](@/assets/images/load-test-follow-up/log-routing.svg)
 
 Logback은 로그의 출력 경로를 정하고, FireLens의 Fluent Bit은 콘솔 로그의 목적지를 나눕니다. OTEL은 별도 경로로 보냅니다.
 
@@ -30,7 +30,17 @@ Logback은 로그의 출력 경로를 정하고, FireLens의 Fluent Bit은 콘�
 
 `console-log.xml`과 `otel-log.xml`에서 appender를 정의하고, `click-log.xml`과 `transaction-log.xml`에서 로거별 출력 경로를 정했습니다. root 로거에는 CONSOLE과 OTEL을 연결했습니다.
 
-통계 이벤트의 전용 로거에는 CONSOLE만 연결했습니다. [`additivity="false"`](https://logback.qos.ch/manual/architecture.html#AppenderAdditivity)로 상위 로거로의 전달을 끊어 콘솔 중복 출력과 OTEL 전송을 막았습니다.
+통계 이벤트의 전용 로거에는 `CONSOLE_RAW`만 연결했습니다. [`additivity="false"`](https://logback.qos.ch/manual/architecture.html#AppenderAdditivity)로 상위 로거로의 전달을 끊어 콘솔 중복 출력과 OTEL 전송을 막았습니다.
+
+`click-log.xml`의 설정입니다.
+
+```xml file="click-log.xml"
+<included>
+    <logger name="CLICK_LOGGER" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE_RAW"/>
+    </logger>
+</included>
+```
 
 PoC에서는 통계 이벤트가 한 줄의 JSON으로 출력되고, `logtype`이 최상위 필드에 들어가는지 확인하려고 합니다.
 
