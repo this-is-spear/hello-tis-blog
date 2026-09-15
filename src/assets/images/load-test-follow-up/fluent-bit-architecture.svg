@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="820" viewBox="0 0 1600 820" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
 <title id="title">ECS FireLens 기반 로그 수집 구조</title>
-<desc id="desc">공유된 PoC 설정 기준 구조. ECS 태스크의 app 컨테이너는 일반 로그를 CONSOLE과 OTEL로, 통계 이벤트를 전용 로거의 CONSOLE_RAW로 출력한다. 콘솔 로그는 awsfirelens 로그 드라이버를 통해 log_router 컨테이너의 Fluent Bit으로 전달된다. Fluent Bit은 JSON 파싱 후 rewrite_tag 필터로 logtype이 splunk인 로그를 Splunk HEC로, 나머지를 CloudWatch Logs로 보낸다. OTEL은 기존의 별도 수집 경로를 유지한다.</desc>
+<desc id="desc">공유된 PoC 설정 기준 구조. ECS 태스크의 app 컨테이너는 일반 로그를 CONSOLE과 OTEL로, 통계 이벤트를 전용 로거의 CONSOLE_RAW로 출력한다. 콘솔 로그는 awsfirelens 로그 드라이버를 통해 log_router 컨테이너의 Fluent Bit으로 전달된다. Fluent Bit은 JSON 파싱 후 rewrite_tag 필터로 logtype이 splunk인 로그를 Splunk HEC로, 나머지를 CloudWatch Logs로 보낸다. logtype이 s3인 인입 로그를 S3로 보내는 추가안을 점선으로 표시한다. OTEL은 기존의 별도 수집 경로를 유지한다.</desc>
 <defs>
 <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M2 1 L9 5 L2 9" fill="none" stroke="#64748b" stroke-width="1.7"/></marker>
 <style>
@@ -13,10 +13,10 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'No
 .line {fill:none;stroke:#64748b;stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round;marker-end:url(#arrow);}
 </style>
 </defs>
-<rect width="1600" height="820" rx="20" fill="#fff"/>
+<rect width="1600" height="1000" rx="20" fill="#fff"/>
 <text class="heading" x="40" y="58">ECS FireLens 기반 로그 수집 구조</text>
-<text class="small" x="40" y="91">공유한 PoC 설정 기준 · 일반 로그 수집을 유지하면서 통계 이벤트 분기</text>
-<rect x="32" y="135" width="1216" height="640" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+<text class="small" x="40" y="91">일반 로그·통계 이벤트 분기와 S3 보관 경로 추가안</text>
+<rect x="32" y="135" width="1216" height="800" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
 <text class="label" x="58" y="174">ECS 태스크</text>
 <rect class="box" x="66" y="210" width="484" height="422" rx="12"/>
 <text class="label" x="92" y="250">app 컨테이너</text>
@@ -64,9 +64,15 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'No
 <path class="line" d="M1188 527 H1266 V559 H1310"/>
 <text class="small" x="1310" y="476">logtype=splunk</text>
 <text class="small" x="1310" y="501">태그: altools.splunk</text>
-<path class="line" d="M524 568 H582 V725 H1310"/>
-<text class="small" x="616" y="709">OTEL · 기존 별도 경로</text>
-<rect class="box" x="1310" y="683" width="252" height="84" rx="10"/>
-<text class="label center" x="1436" y="732">OTEL 수집 경로</text>
+<path class="line" d="M1188 540 H1228 V751 H1310" stroke-dasharray="6 5"/>
+<text class="small" x="1310" y="684">logtype=s3</text>
+<rect class="box" x="1310" y="708" width="252" height="86" rx="10"/>
+<text class="label center" x="1436" y="744">S3</text>
+<text class="small center" x="1436" y="773">VoC 대응용 인입 로그 보관</text>
+<path class="line" d="M524 568 H582 V892 H1310"/>
+<text class="small" x="616" y="875">OTEL · 기존 별도 경로</text>
+<rect class="box" x="1310" y="850" width="252" height="84" rx="10"/>
+<text class="label center" x="1436" y="899">OTEL 수집 경로</text>
 <path class="line" d="M580 380 H828"/>
+<text class="small" x="40" y="977">점선: logtype=s3인 인입 로그를 S3로 보내는 추가안</text>
 </svg>

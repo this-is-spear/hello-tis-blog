@@ -45,7 +45,7 @@ VoC 대응용 인입 로그는 `logtype=s3`로 구분해 S3로 보내는 경로�
 
 기존 서비스의 동작을 유지하면서 새로운 통계 수집 방식을 적용하려고 합니다. 일반 로그는 계속 CloudWatch로 보내고, 통계 이벤트는 Splunk로 보내기로 했습니다.
 
-![ECS 태스크의 app 컨테이너에서 나온 콘솔 로그가 awsfirelens를 통해 log_router의 Fluent Bit으로 전달됩니다. logtype=splunk인 로그는 Splunk HEC로, 나머지는 CloudWatch로 보냅니다. OTEL 전송 경로는 따로 유지합니다.](@/assets/images/load-test-follow-up/fluent-bit-architecture.svg)
+![ECS의 app 컨테이너에서 출력한 콘솔 로그를 awsfirelens로 수집해 Splunk HEC와 CloudWatch로 분기하는 상세 구조. logtype=s3인 인입 로그의 S3 보관 경로는 추가안으로 점선 표시하며 OTEL 경로는 별도로 유지합니다.](@/assets/images/load-test-follow-up/fluent-bit-architecture.svg)
 
 Logback은 로그의 출력 경로를 정하고, Fluent Bit은 콘솔 로그를 목적지별로 나눠 보냅니다. OTEL 전송 경로는 따로 유지합니다.
 
