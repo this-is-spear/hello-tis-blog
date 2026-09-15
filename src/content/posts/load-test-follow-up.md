@@ -14,7 +14,17 @@ tags:
 
 ## Splunk 통계 수집 일원화
 
-Splunk 통계 수집 방식이 서비스마다 다릅니다. API로 보내기도 하고 UF를 사용하기도 합니다. 인프라팀에서는 중간 경로가 많아 관리하기 어렵다는 피드백을 줬습니다.
+기존에는 서비스에 따라 **API 직접 전송과 UF 파일 수집**, 두 가지 방식을 사용하고 있었습니다.
+
+**API 직접 전송**은 애플리케이션 내부에서 Splunk API를 호출해 통계 이벤트를 보내는 방식입니다.
+
+![애플리케이션 내부에서 통계 이벤트를 생성하고 Splunk API를 직접 호출해 전송하는 기존 구조](@/assets/images/load-test-follow-up/splunk-direct-api-architecture.svg)
+
+**UF 파일 수집**은 애플리케이션이 EFS에 로그 파일을 저장하고, EFS를 마운트한 EC2에서 UF 컨테이너가 파일을 읽어 Splunk Cloud로 보내는 방식입니다. 로그 파일은 EFS에, UF의 전송 체크포인트는 별도 Docker 볼륨에 보관했습니다.
+
+![애플리케이션이 EFS에 저장한 로그 파일을 EC2의 UF 컨테이너가 읽어 Splunk Cloud로 전송하는 기존 구조](@/assets/images/load-test-follow-up/uf-architecture.svg)
+
+수집 방식이 나뉘어 있었고, 인프라팀에서는 중간 경로가 많아 관리하기 어렵다는 피드백을 줬습니다.
 
 수집 방식을 일원화하기 위해 ECS의 FireLens를 적용하는 PoC를 진행하고 있습니다. 콘솔 로그를 모아 `logtype`에 따라 목적지를 나누는 방식입니다. 애플리케이션과 Fluent Bit이 각각 어디까지 처리해야 확장하기 쉬울지 고민하고 있습니다.
 

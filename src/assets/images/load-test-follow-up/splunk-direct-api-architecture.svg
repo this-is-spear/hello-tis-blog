@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="530" viewBox="0 0 1440 530" role="img" aria-labelledby="title desc">
+<title id="title">기존 애플리케이션의 Splunk API 직접 전송 구조</title>
+<desc id="desc">기존 통계 수집 방식 중 API 직접 전송 경로. 애플리케이션 내부에서 통계 이벤트를 생성하고 Splunk API를 직접 호출해 전송한다. 파일을 EFS에 저장하고 UF로 수집하는 방식과 함께 사용하던 별도의 수집 경로다.</desc>
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M2 1 L9 5 L2 9" fill="none" stroke="#64748b" stroke-width="1.7"/></marker>
+<style>
+text {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;fill:#243244;}
+.heading {font-size:30px;font-weight:650;}
+.label {font-size:22px;font-weight:600;}
+.small {font-size:18px;fill:#64748b;}
+.center {text-anchor:middle;}
+.box {fill:white;stroke:#cbd5e1;stroke-width:1.4;}
+.line {fill:none;stroke:#64748b;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow);}
+</style>
+</defs>
+<rect width="1440" height="530" rx="20" fill="#fff"/>
+<text class="heading" x="40" y="58">기존 Splunk API 직접 전송 구조</text>
+<text class="small" x="40" y="93">애플리케이션 내부에서 통계 이벤트를 생성하고 API로 직접 전송</text>
+<rect x="40" y="161" width="830" height="270" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+<text class="label" x="68" y="205">애플리케이션</text>
+<rect class="box" x="84" y="260" width="272" height="108" rx="10"/>
+<text class="label center" x="220" y="305">통계 이벤트 생성</text>
+<text class="small center" x="220" y="336">수집할 통계 데이터</text>
+<rect x="526" y="260" width="300" height="108" rx="10" fill="#eef4fa" stroke="#94a3b8" stroke-width="1.4"/>
+<text class="label center" x="676" y="305">Splunk API 호출</text>
+<text class="small center" x="676" y="336">애플리케이션 내부 코드</text>
+<path class="line" d="M356 314 H526"/>
+<text class="small center" x="441" y="291">이벤트 전달</text>
+<rect class="box" x="1100" y="260" width="300" height="108" rx="10"/>
+<text class="label center" x="1250" y="305">Splunk</text>
+<text class="small center" x="1250" y="336">통계 이벤트 수집</text>
+<path class="line" d="M826 314 H1100"/>
+<text class="small center" x="965" y="290">API 요청</text>
+<text class="small" x="40" y="489">기존 수집 방식: API 직접 전송 · EFS 로그 파일을 UF로 수집</text>
+</svg>
