@@ -37,7 +37,7 @@ VoC에 대응하기 위해 일부 기능의 인입 로그를 S3에 보관하고 
 
 수집 방식을 일원화하기 위해 ECS에서 FireLens PoC를 진행하고 있습니다. 콘솔 로그 중 `logtype=splunk`인 로그는 Splunk로, 나머지는 기존 CloudWatch로 보냅니다.
 
-![FireLens가 logtype=splunk인 로그는 Splunk로, 나머지는 CloudWatch로 보내는 구조에 logtype=s3인 인입 로그를 S3로 보내는 경로를 점선으로 추가한 도식](@/assets/images/load-test-follow-up/firelens-simple-architecture.svg)
+![FireLens에서 logtype에 따라 CloudWatch·Splunk·S3로 로그를 분기하는 구조](@/assets/images/load-test-follow-up/firelens-simple-architecture.svg)
 
 VoC 대응용 인입 로그는 `logtype=s3`로 구분해 S3로 보내는 경로를 추가하려고 합니다.
 
@@ -45,7 +45,7 @@ VoC 대응용 인입 로그는 `logtype=s3`로 구분해 S3로 보내는 경로�
 
 기존 서비스의 동작을 유지하면서 새로운 통계 수집 방식을 적용하려고 합니다. 일반 로그는 계속 CloudWatch로 보내고, 통계 이벤트는 Splunk로 보내기로 했습니다.
 
-![ECS의 app 컨테이너에서 출력한 콘솔 로그를 awsfirelens로 수집해 Splunk HEC와 CloudWatch로 분기하는 상세 구조. logtype=s3인 인입 로그의 S3 보관 경로는 추가안으로 점선 표시하며 OTEL 경로는 별도로 유지합니다.](@/assets/images/load-test-follow-up/fluent-bit-architecture.svg)
+![ECS의 콘솔 로그를 awsfirelens로 수집해 CloudWatch·Splunk HEC·S3로 분기하고 OTEL 경로를 별도로 유지하는 상세 구조](@/assets/images/load-test-follow-up/fluent-bit-architecture.svg)
 
 Logback은 로그의 출력 경로를 정하고, Fluent Bit은 콘솔 로그를 목적지별로 나눠 보냅니다. OTEL 전송 경로는 따로 유지합니다.
 

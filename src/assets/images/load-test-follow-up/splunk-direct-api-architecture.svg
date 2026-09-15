@@ -31,5 +31,4 @@ text {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto S
 <text class="small center" x="1250" y="336">통계 이벤트 수집</text>
 <path class="line" d="M826 314 H1100"/>
 <text class="small center" x="965" y="290">API 요청</text>
-<text class="small" x="40" y="489">기존 수집 방식: API 직접 전송 · EFS 로그 파일을 UF로 수집</text>
 </svg>

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1440" height="650" viewBox="0 0 1440 650" role="img" aria-labelledby="title desc">
 <title id="title">신규 FireLens 기반 로그 수집 구조</title>
-<desc id="desc">ECS 태스크 안에서 애플리케이션이 콘솔 로그를 출력하면 FireLens의 Fluent Bit이 수집한다. logtype이 splunk인 통계 이벤트는 Splunk로, s3인 인입 로그는 S3로, 나머지는 CloudWatch로 보낸다. S3 경로는 추가안이며 점선으로 표시한다.</desc>
+<desc id="desc">ECS 태스크 안에서 애플리케이션이 콘솔 로그를 출력하면 FireLens의 Fluent Bit이 수집한다. logtype이 splunk인 통계 이벤트는 Splunk로, s3인 인입 로그는 S3로, 나머지는 CloudWatch로 보낸다.</desc>
 <defs>
 <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M2 1 L9 5 L2 9" fill="none" stroke="#64748b" stroke-width="1.7"/></marker>
 <style>

@@ -57,5 +57,4 @@ text {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto S
 <text class="small center" x="1070" y="555">splunk-uf-var 볼륨</text>
 <path class="line" d="M1087 410 V488" stroke-dasharray="5 5"/>
 <text class="small" x="972" y="455">진행 위치 저장</text>
-<text class="small" x="40" y="628">로그 파일: EFS에 보관 · UF 전송 체크포인트: 별도 Docker 볼륨에 보관</text>
 </svg>
