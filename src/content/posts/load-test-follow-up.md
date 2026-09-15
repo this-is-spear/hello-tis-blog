@@ -37,7 +37,9 @@ VoC에 대응하기 위해 일부 기능의 인입 로그를 S3에 보관하고 
 
 수집 방식을 일원화하기 위해 ECS에서 FireLens PoC를 진행하고 있습니다. 콘솔 로그 중 `logtype=splunk`인 로그는 Splunk로, 나머지는 기존 CloudWatch로 보냅니다.
 
-![ECS 애플리케이션의 콘솔 로그를 FireLens가 수집해 logtype=splunk인 로그는 Splunk로, 나머지는 CloudWatch로 보내는 신규 구조](@/assets/images/load-test-follow-up/firelens-simple-architecture.svg)
+![FireLens가 logtype=splunk인 로그는 Splunk로, 나머지는 CloudWatch로 보내는 구조에 logtype=s3인 인입 로그를 S3로 보내는 경로를 점선으로 추가한 도식](@/assets/images/load-test-follow-up/firelens-simple-architecture.svg)
+
+VoC 대응용 인입 로그는 `logtype=s3`로 구분해 S3로 보내는 경로를 추가하려고 합니다.
 
 ### CloudWatch 유지
 

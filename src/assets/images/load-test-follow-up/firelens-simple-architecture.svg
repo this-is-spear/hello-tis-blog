@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="570" viewBox="0 0 1440 570" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="650" viewBox="0 0 1440 650" role="img" aria-labelledby="title desc">
 <title id="title">신규 FireLens 기반 로그 수집 구조</title>
-<desc id="desc">ECS 태스크 안에서 애플리케이션이 콘솔 로그를 출력하면 FireLens의 Fluent Bit이 수집한다. logtype이 splunk인 통계 이벤트는 Splunk로 보내고, 나머지 로그는 기존 CloudWatch로 보내는 구조다.</desc>
+<desc id="desc">ECS 태스크 안에서 애플리케이션이 콘솔 로그를 출력하면 FireLens의 Fluent Bit이 수집한다. logtype이 splunk인 통계 이벤트는 Splunk로, s3인 인입 로그는 S3로, 나머지는 CloudWatch로 보낸다. S3 경로는 추가안이며 점선으로 표시한다.</desc>
 <defs>
 <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M2 1 L9 5 L2 9" fill="none" stroke="#64748b" stroke-width="1.7"/></marker>
 <style>
@@ -13,28 +13,33 @@ text {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto S
 .line {fill:none;stroke:#64748b;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arrow);}
 </style>
 </defs>
-<rect width="1440" height="570" rx="20" fill="#fff"/>
+<rect width="1440" height="650" rx="20" fill="#fff"/>
 <text class="heading" x="40" y="58">신규 FireLens 기반 로그 수집 구조</text>
-<text class="small" x="40" y="93">콘솔 로그를 수집해 기존 CloudWatch 경로와 Splunk 통계 경로로 분기</text>
-<rect x="40" y="168" width="858" height="318" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
+<text class="small" x="40" y="93">콘솔 로그를 수집해 CloudWatch·Splunk·S3로 분기</text>
+<rect x="40" y="168" width="858" height="364" rx="16" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.4"/>
 <text class="label" x="68" y="211">ECS 태스크</text>
-<rect class="box" x="84" y="276" width="252" height="112" rx="10"/>
-<text class="label center" x="210" y="322">애플리케이션</text>
-<text class="small center" x="210" y="354">콘솔 로그 출력</text>
-<rect x="576" y="276" width="278" height="112" rx="10" fill="#eef4fa" stroke="#94a3b8" stroke-width="1.4"/>
-<text class="label center" x="715" y="322">FireLens · Fluent Bit</text>
-<text class="small center" x="715" y="354">logtype에 따라 분기</text>
-<path class="line" d="M336 332 H576"/>
-<text class="small center" x="456" y="305">콘솔 로그 수집</text>
-<rect class="box" x="1136" y="202" width="264" height="104" rx="10"/>
-<text class="label center" x="1268" y="245">CloudWatch</text>
-<text class="small center" x="1268" y="276">기존 일반 로그 수집 유지</text>
-<rect class="box" x="1136" y="378" width="264" height="104" rx="10"/>
-<text class="label center" x="1268" y="421">Splunk</text>
-<text class="small center" x="1268" y="452">통계 이벤트 수집</text>
-<path class="line" d="M854 316 H944 V254 H1136"/>
-<path class="line" d="M854 348 H944 V430 H1136"/>
-<text class="small center" x="1029" y="226">그 외 로그</text>
-<text class="small center" x="1029" y="400">logtype=splunk</text>
-<text class="small" x="40" y="539">일반 로그 수집은 유지하고, 통계 이벤트의 전송 경로를 공통화</text>
+<rect class="box" x="84" y="306" width="252" height="112" rx="10"/>
+<text class="label center" x="210" y="352">애플리케이션</text>
+<text class="small center" x="210" y="384">콘솔 로그 출력</text>
+<rect x="576" y="306" width="278" height="112" rx="10" fill="#eef4fa" stroke="#94a3b8" stroke-width="1.4"/>
+<text class="label center" x="715" y="352">FireLens · Fluent Bit</text>
+<text class="small center" x="715" y="384">logtype에 따라 분기</text>
+<path class="line" d="M336 362 H576"/>
+<text class="small center" x="456" y="335">콘솔 로그 수집</text>
+<rect class="box" x="1136" y="168" width="264" height="104" rx="10"/>
+<text class="label center" x="1268" y="211">CloudWatch</text>
+<text class="small center" x="1268" y="242">기존 일반 로그 수집 유지</text>
+<rect class="box" x="1136" y="324" width="264" height="104" rx="10"/>
+<text class="label center" x="1268" y="367">Splunk</text>
+<text class="small center" x="1268" y="398">통계 이벤트 수집</text>
+<rect class="box" x="1136" y="480" width="264" height="104" rx="10"/>
+<text class="label center" x="1268" y="523">S3</text>
+<text class="small center" x="1268" y="554">VoC 대응용 인입 로그 보관</text>
+<path class="line" d="M854 340 H944 V220 H1136"/>
+<path class="line" d="M854 362 H982 V376 H1136"/>
+<path class="line" d="M854 384 H944 V532 H1136" stroke-dasharray="6 5"/>
+<text class="small center" x="1030" y="192">그 외 로그</text>
+<text class="small center" x="1048" y="347">logtype=splunk</text>
+<text class="small center" x="1030" y="504">logtype=s3</text>
+<text class="small" x="40" y="612">점선: VoC 대응용 인입 로그를 S3로 보내는 추가안</text>
 </svg>
