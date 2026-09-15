@@ -14,31 +14,28 @@ tags:
 
 ## Splunk 통계 수집 일원화
 
-기존에는 서비스에 따라 **API 직접 전송과 UF 파일 수집**, 두 가지 방식을 사용하고 있었습니다.
+### 지금 겪는 문제
 
-**기존 방식 1 — API 직접 전송:** 애플리케이션이 Splunk API로 통계 이벤트를 보냅니다.
+- 같은 통계 데이터를 수집하면서도 API 직접 전송과 UF 파일 수집으로 경로가 나뉘는 경우가 있었습니다.
+- 서로 다른 통계 데이터도 수집 방식이 제각각이라, 공통된 방식으로 관리하기 어려웠습니다.
 
-![애플리케이션 내부에서 통계 이벤트를 생성하고 Splunk API를 직접 호출해 전송하는 기존 구조](@/assets/images/load-test-follow-up/splunk-direct-api-architecture.svg)
+일부 기능은 VoC 대응에 인입 로그를 활용해, 해당 로그를 S3에도 보관하고 있습니다. 이런 보관 요구를 유지하면서 데이터별 수집 경로·저장 위치·설정을 따로 관리해야 해 부담이 컸습니다. 인프라팀에서도 중간 경로가 많아 관리하기 어렵다는 피드백을 줬습니다.
+
+### 기존 수집 방식의 예시
 
 **기존 방식 2 — UF 파일 수집:** EC2의 UF가 마운트된 EFS의 로그 파일을 읽어 Splunk로 보냅니다.
 
 ![애플리케이션이 EFS에 저장한 로그 파일을 EC2의 UF 컨테이너가 읽어 Splunk Cloud로 전송하는 기존 구조](@/assets/images/load-test-follow-up/uf-architecture.svg)
 
-### 지금 겪는 문제
+로그를 전달하기 위해 EFS·EC2·UF를 함께 관리해야 했고, EFS와 EC2의 사용 비용도 들었습니다.
 
-- 같은 통계 데이터를 수집하면서도 API 직접 전송과 UF 파일 수집으로 경로가 나뉘는 경우가 있었습니다.
-- 서로 다른 통계 데이터도 수집 방식이 제각각이라, 공통된 방식으로 관리하기 어려웠습니다.
-- 일부 기능은 VoC 대응에 인입 로그를 활용해, 해당 로그를 S3에도 보관하고 있습니다.
+**기존 방식 1 — API 직접 전송:** 일부 서비스는 애플리케이션에서 Splunk API를 직접 호출해 통계 이벤트를 보냈습니다.
 
-데이터와 활용 목적에 따라 수집 경로·저장 위치·설정을 따로 확인해야 해 관리 부담이 컸습니다. 인프라팀에서도 중간 경로가 많아 관리하기 어렵다는 피드백을 줬습니다.
+### 신규 방식 — FireLens
 
-수집 방식을 일원화하기 위해 ECS의 FireLens를 적용하는 PoC를 진행하고 있습니다.
-
-**신규 방식 — FireLens:** 콘솔 로그를 수집해 `logtype=splunk`는 Splunk로, 나머지는 기존 CloudWatch로 보냅니다.
+수집 방식을 일원화하기 위해 ECS의 FireLens를 적용하는 PoC를 진행하고 있습니다. 콘솔 로그를 수집해 `logtype=splunk`는 Splunk로, 나머지는 기존 CloudWatch로 보냅니다.
 
 ![ECS 애플리케이션의 콘솔 로그를 FireLens가 수집해 logtype=splunk는 Splunk로, 나머지는 CloudWatch로 보내는 신규 구조](@/assets/images/load-test-follow-up/firelens-simple-architecture.svg)
-
-애플리케이션과 Fluent Bit이 각각 어디까지 처리해야 확장하기 쉬울지 고민하고 있습니다.
 
 ### CloudWatch 유지
 
