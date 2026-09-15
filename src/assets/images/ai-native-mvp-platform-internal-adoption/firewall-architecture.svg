@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">단일 MVP 플랫폼 서버의 인바운드와 아웃바운드</title>
+  <desc id="desc">왼쪽의 사내 사용자와 VPN, 운영 담당자, GitHub Webhook이 TCP 443으로 중앙의 MVP 플랫폼 서버에 접근한다. 서버는 오른쪽 GitHub에 TCP 443으로 인증, 저장소 생성과 조회, 소스 다운로드, Poller 조회를 요청한다. 서버 내부 구성과 이미지 및 패키지 저장소는 생략했다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" viewBox="0 0 8 8">
+      <path d="M0 0L8 4L0 8Z" fill="#56718c"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; fill: #243442; }
+      .title { font-size: 28px; font-weight: 700; }
+      .heading { font-size: 23px; font-weight: 700; fill: #426583; }
+      .name { font-size: 25px; font-weight: 600; }
+      .label { font-size: 20px; fill: #4e6070; }
+      .edge { fill: none; stroke: #56718c; stroke-width: 2.5; stroke-linejoin: round; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1200" height="520" rx="12" fill="#fafbf9"/>
+  <text x="40" y="48" class="title">MVP 플랫폼 · 서버 접근 흐름</text>
+
+  <rect x="30" y="80" width="285" height="405" rx="14" fill="#eef5fb" stroke="#c8d8e6"/>
+  <text x="172" y="116" class="heading" text-anchor="middle">인바운드</text>
+  <rect x="950" y="80" width="225" height="405" rx="14" fill="#eef7f0" stroke="#c7ddcd"/>
+  <text x="1062" y="116" class="heading" text-anchor="middle">아웃바운드</text>
+
+  <rect x="50" y="140" width="245" height="80" rx="10" fill="#ffffff" stroke="#9db4c8"/>
+  <text x="172" y="189" class="name" text-anchor="middle">사내 사용자 · VPN</text>
+  <rect x="50" y="260" width="245" height="80" rx="10" fill="#ffffff" stroke="#9db4c8"/>
+  <text x="172" y="309" class="name" text-anchor="middle">운영 담당자</text>
+  <rect x="50" y="380" width="245" height="80" rx="10" fill="#ffffff" stroke="#9db4c8"/>
+  <text x="172" y="429" class="name" text-anchor="middle">GitHub Webhook</text>
+
+  <path d="M295 180H500V265H545" class="edge"/>
+  <text x="406" y="146" class="label" text-anchor="middle">TCP 443</text>
+  <text x="406" y="170" class="label" text-anchor="middle">포털 · Preview 접속</text>
+  <path d="M295 300H545" class="edge"/>
+  <text x="418" y="266" class="label" text-anchor="middle">TCP 443</text>
+  <text x="418" y="290" class="label" text-anchor="middle">운영 화면 · 관리 요청</text>
+  <path d="M295 420H500V335H545" class="edge"/>
+  <text x="406" y="386" class="label" text-anchor="middle">TCP 443</text>
+  <text x="406" y="410" class="label" text-anchor="middle">Push 이벤트 수신</text>
+
+  <rect x="550" y="245" width="240" height="110" rx="12" fill="#e3eef9" stroke="#597d9e" stroke-width="2"/>
+  <text x="670" y="294" class="name" text-anchor="middle">MVP 플랫폼 서버</text>
+  <text x="670" y="326" class="label" text-anchor="middle">단일 서버</text>
+
+  <path d="M790 300H964" class="edge"/>
+  <text x="878" y="284" class="label" text-anchor="middle">TCP 443</text>
+  <rect x="970" y="195" width="185" height="210" rx="10" fill="#ffffff" stroke="#93b69e"/>
+  <text x="1062" y="238" class="name" text-anchor="middle">GitHub</text>
+  <text x="1062" y="280" class="label" text-anchor="middle">인증</text>
+  <text x="1062" y="312" class="label" text-anchor="middle">저장소 생성·조회</text>
+  <text x="1062" y="344" class="label" text-anchor="middle">소스 다운로드</text>
+  <text x="1062" y="376" class="label" text-anchor="middle">Poller 조회</text>
+</svg>

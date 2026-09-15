@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1110" viewBox="0 0 1200 1110" role="img" aria-labelledby="title desc">
+  <title id="title">MVP 플랫폼의 프로젝트 상태 머신</title>
+  <desc id="desc">ProjectStatus에 정의된 8개 상태와 14개 허용 전이. CREATING에서 CREATED, BUILDING, TESTING, DEPLOYING, RUNNING으로 진행한다. CREATING부터 DEPLOYING까지 FAILED로 전이할 수 있고 FAILED는 BUILDING으로 재시도한다. DEPLOYING에서 Ready 확인 또는 롤백이 성공하면 RUNNING으로, 복구가 불가능하면 DEPLOY_FAILED로 전이한다. RUNNING에서 BUILDING 또는 DEPLOYING으로 전이할 수 있다. DEPLOY_FAILED에는 다음 전이가 정의되지 않아 재시도 전 운영자 개입이 필요하다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" viewBox="0 0 8 8"><path d="M0 0L8 4L0 8Z" fill="#56718c"/></marker>
+    <marker id="error-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" viewBox="0 0 8 8"><path d="M0 0L8 4L0 8Z" fill="#b7665e"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; fill: #243442; }
+      .title { font-size: 29px; font-weight: 700; }
+      .name { font-size: 27px; font-weight: 700; }
+      .body { font-size: 22px; }
+      .label { font-size: 21px; fill: #4e6070; }
+      .error-label { font-size: 21px; fill: #9e4a43; }
+      .edge { fill: none; stroke: #56718c; stroke-width: 2.5; stroke-linejoin: round; marker-end: url(#arrow); }
+      .error { fill: none; stroke: #b7665e; stroke-width: 2.3; stroke-linejoin: round; marker-end: url(#error-arrow); }
+      .node { fill: #eef5fb; stroke: #91adc5; stroke-width: 1.6; }
+    </style>
+  </defs>
+  <rect width="1200" height="1110" fill="#fafbf9" rx="14"/>
+  <text x="40" y="49" class="title">프로젝트 상태 머신</text>
+  <text x="40" y="82" class="label">ProjectStatus에 정의된 상태와 허용 전이</text>
+
+  <circle cx="595" cy="112" r="8" fill="#56718c"/>
+  <path d="M595 120V140" class="edge"/>
+
+  <g data-from="CREATING" data-to="CREATED"><path d="M595 225V280" class="edge"/><text x="618" y="263" class="label">PROJECT_READY</text></g>
+  <g data-from="CREATED" data-to="BUILDING"><path d="M595 365V420" class="edge"/><text x="618" y="403" class="label">BUILD_STARTED</text></g>
+  <g data-from="BUILDING" data-to="TESTING"><path d="M595 505V560" class="edge"/><text x="618" y="543" class="label">TEST_STARTED</text></g>
+  <g data-from="TESTING" data-to="DEPLOYING"><path d="M595 645V700" class="edge"/><text x="618" y="683" class="label">DEPLOY_STARTED</text></g>
+  <g data-from="DEPLOYING" data-to="RUNNING">
+    <path d="M595 785V920" class="edge"/>
+    <text x="340" y="837" class="label" text-anchor="middle">Ready 확인 성공</text>
+    <text x="340" y="869" class="label" text-anchor="middle">또는 이전 버전 복구 성공</text>
+  </g>
+
+  <g data-from="CREATING" data-to="FAILED"><path d="M465 185H365V465H325" class="error"/></g>
+  <g data-from="CREATED" data-to="FAILED"><path d="M465 325H365V465H325" class="error"/></g>
+  <g data-from="BUILDING" data-to="FAILED"><path d="M465 465H325" class="error"/></g>
+  <g data-from="TESTING" data-to="FAILED"><path d="M465 605H365V465H325" class="error"/></g>
+  <g data-from="DEPLOYING" data-to="FAILED"><path d="M465 745H365V465H325" class="error"/></g>
+  <text x="190" y="326" class="error-label" text-anchor="middle">생성·빌드·테스트 실패</text>
+  <text x="190" y="358" class="error-label" text-anchor="middle">또는 처리 예외</text>
+
+  <g data-from="FAILED" data-to="BUILDING">
+    <path d="M190 505V548H425V490H460" class="edge"/>
+    <text x="190" y="582" class="label" text-anchor="middle">재시도 작업 시작</text>
+  </g>
+
+  <g data-from="DEPLOYING" data-to="DEPLOY_FAILED">
+    <path d="M725 745H855" class="error"/>
+    <text x="1010" y="647" class="error-label" text-anchor="middle">Ready 실패</text>
+    <text x="1010" y="679" class="error-label" text-anchor="middle">복구 불가</text>
+  </g>
+  <g data-from="RUNNING" data-to="BUILDING">
+    <path d="M725 965H1170V465H730" class="edge"/>
+    <text x="943" y="430" class="label" text-anchor="middle">새 커밋 · 재배포 작업 시작</text>
+  </g>
+  <g data-from="RUNNING" data-to="DEPLOYING">
+    <path d="M725 945H800V770H730" class="edge" stroke-dasharray="7 5"/>
+    <text x="823" y="850" class="label">직접 전이도 허용</text>
+    <text x="823" y="880" class="label">일반 재배포는 BUILDING부터</text>
+  </g>
+
+  <g data-state="CREATING"><rect x="465" y="145" width="260" height="80" rx="12" class="node"/><text x="595" y="177" class="name" text-anchor="middle">CREATING</text><text x="595" y="208" class="body" text-anchor="middle">프로젝트 생성 중</text></g>
+  <g data-state="CREATED"><rect x="465" y="285" width="260" height="80" rx="12" class="node"/><text x="595" y="317" class="name" text-anchor="middle">CREATED</text><text x="595" y="348" class="body" text-anchor="middle">프로젝트 생성 완료</text></g>
+  <g data-state="BUILDING"><rect x="465" y="425" width="260" height="80" rx="12" class="node"/><text x="595" y="457" class="name" text-anchor="middle">BUILDING</text><text x="595" y="488" class="body" text-anchor="middle">이미지 빌드 중</text></g>
+  <g data-state="TESTING"><rect x="465" y="565" width="260" height="80" rx="12" class="node"/><text x="595" y="597" class="name" text-anchor="middle">TESTING</text><text x="595" y="628" class="body" text-anchor="middle">테스트 중</text></g>
+  <g data-state="DEPLOYING"><rect x="465" y="705" width="260" height="80" rx="12" class="node"/><text x="595" y="737" class="name" text-anchor="middle">DEPLOYING</text><text x="595" y="768" class="body" text-anchor="middle">Preview 배포 중</text></g>
+  <g data-state="RUNNING"><rect x="465" y="925" width="260" height="80" rx="12" fill="#eaf5ed" stroke="#84a88e" stroke-width="1.8"/><text x="595" y="957" class="name" text-anchor="middle">RUNNING</text><text x="595" y="988" class="body" text-anchor="middle">정상 Preview 실행</text></g>
+  <g data-state="FAILED"><rect x="60" y="425" width="260" height="80" rx="12" fill="#fff2ee" stroke="#be8980" stroke-width="1.8"/><text x="190" y="457" class="name" text-anchor="middle">FAILED</text><text x="190" y="488" class="body" text-anchor="middle">작업 실패</text></g>
+  <g data-state="DEPLOY_FAILED"><rect x="860" y="705" width="290" height="80" rx="12" fill="#fff2ee" stroke="#be8980" stroke-width="1.8"/><text x="1005" y="737" class="name" text-anchor="middle">DEPLOY_FAILED</text><text x="1005" y="768" class="body" text-anchor="middle">재시도 전 운영자 개입</text></g>
+
+  <text x="40" y="1054" class="label">롤백 성공: 프로젝트는 RUNNING, 이번 배포 시도의 결과는 FAILED.</text>
+  <text x="40" y="1086" class="label">복구 도중 예외가 발생하면 DEPLOY_FAILED가 아닌 FAILED로 기록한다.</text>
+</svg>
