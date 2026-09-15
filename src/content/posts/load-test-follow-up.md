@@ -16,11 +16,11 @@ tags:
 
 기존에는 서비스에 따라 **API 직접 전송과 UF 파일 수집**, 두 가지 방식을 사용하고 있었습니다.
 
-**API 직접 전송:** 애플리케이션이 Splunk API로 통계 이벤트를 보냅니다.
+**기존 방식 1 — API 직접 전송:** 애플리케이션이 Splunk API로 통계 이벤트를 보냅니다.
 
 ![애플리케이션 내부에서 통계 이벤트를 생성하고 Splunk API를 직접 호출해 전송하는 기존 구조](@/assets/images/load-test-follow-up/splunk-direct-api-architecture.svg)
 
-**UF 파일 수집:** EC2의 UF가 마운트된 EFS의 로그 파일을 읽어 Splunk로 보냅니다.
+**기존 방식 2 — UF 파일 수집:** EC2의 UF가 마운트된 EFS의 로그 파일을 읽어 Splunk로 보냅니다.
 
 ![애플리케이션이 EFS에 저장한 로그 파일을 EC2의 UF 컨테이너가 읽어 Splunk Cloud로 전송하는 기존 구조](@/assets/images/load-test-follow-up/uf-architecture.svg)
 
