@@ -41,5 +41,4 @@ text {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto S
 <text class="small center" x="1030" y="192">그 외 로그</text>
 <text class="small center" x="1048" y="347">logtype=splunk</text>
 <text class="small center" x="1030" y="504">logtype=s3</text>
-<text class="small" x="40" y="612">점선: VoC 대응용 인입 로그를 S3로 보내는 추가안</text>
 </svg>

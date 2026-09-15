@@ -74,5 +74,4 @@ text {font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'No
 <rect class="box" x="1310" y="850" width="252" height="84" rx="10"/>
 <text class="label center" x="1436" y="899">OTEL 수집 경로</text>
 <path class="line" d="M580 380 H828"/>
-<text class="small" x="40" y="977">점선: logtype=s3인 인입 로그를 S3로 보내는 추가안</text>
 </svg>
