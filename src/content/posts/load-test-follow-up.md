@@ -23,13 +23,15 @@ VoC에 대응하기 위해 일부 기능의 인입 로그를 S3에 보관하고 
 
 ### 기존 수집 방식의 예시
 
+**기존 방식 1 — API 직접 전송:** 일부 서비스는 애플리케이션에서 Splunk API를 직접 호출해 통계 이벤트를 보냈습니다.
+
+![애플리케이션 내부에서 통계 이벤트를 생성하고 Splunk API를 직접 호출해 전송하는 기존 구조](@/assets/images/load-test-follow-up/splunk-direct-api-architecture.svg)
+
 **기존 방식 2 — UF 파일 수집:** EC2에 EFS를 마운트하고, UF가 로그 파일을 읽어 Splunk로 보냅니다.
 
 ![애플리케이션이 EFS에 저장한 로그 파일을 EC2의 UF 컨테이너가 읽어 Splunk Cloud로 전송하는 기존 구조](@/assets/images/load-test-follow-up/uf-architecture.svg)
 
 로그 전송을 위해 EFS·EC2·UF를 관리해야 했고, EFS와 EC2의 사용 비용도 들었습니다.
-
-**기존 방식 1 — API 직접 전송:** 일부 서비스는 애플리케이션에서 Splunk API를 직접 호출해 통계 이벤트를 보냈습니다.
 
 ### 신규 방식 — FireLens
 
