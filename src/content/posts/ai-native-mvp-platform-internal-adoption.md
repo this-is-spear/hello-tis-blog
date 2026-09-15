@@ -2,7 +2,6 @@
 title: MVP 검증 플랫폼 구상 - 2단계 사내 적용
 description: 홈서버에 만든 MVP 플랫폼의 개발 리뷰를 받고, 사내 개발에 먼저 적용하기로 한 과정과 운영 반영까지 연결하려는 목표를 정리합니다.
 pubDatetime: 2026-09-15T00:00:00Z
-draft: true
 tags:
   - Platform
 ---
